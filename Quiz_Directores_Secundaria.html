@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Quiz · Guía Directores Secundaria</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@600;700;800&display=swap');
+  :root{
+    --turquesa:#00B4D8; --turquesa-dark:#0088A8; --dorado:#F4A100; --dorado-dark:#C97F00;
+    --crema:#FFF8EC; --navy:#1B3A5C; --verde:#3FBF7F; --coral:#FF6B6B;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:
+      radial-gradient(circle at 15% 20%, rgba(244,161,0,0.13), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(0,180,216,0.15), transparent 45%),
+      var(--crema);
+    font-family:'Nunito',sans-serif;color:var(--navy);display:flex;flex-direction:column;align-items:center;padding:24px 16px 40px;}
+  .wrap{width:100%;max-width:560px;}
+  header{text-align:center;margin-bottom:18px;}
+  .eyebrow{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--dorado-dark);margin:0 0 4px;}
+  h1{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(22px,6vw,30px);margin:0 0 6px;color:var(--navy);}
+  .progress{display:flex;gap:6px;margin:16px 0;flex-wrap:wrap;justify-content:center;}
+  .dot{width:22px;height:22px;border-radius:50%;background:#fff;border:2.5px solid #E6DDCC;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#bbb;transition:.3s;}
+  .dot.done{background:var(--verde);border-color:var(--verde);color:#fff;}
+  .dot.current{border-color:var(--turquesa);color:var(--turquesa-dark);transform:scale(1.15);}
+  .card{background:#fff;border-radius:20px;padding:24px 22px;box-shadow:0 8px 24px rgba(27,58,92,.10);border:2px solid #F0E6D2;}
+  .qnum{font-family:'Baloo 2',sans-serif;font-weight:700;color:var(--turquesa-dark);font-size:14px;margin-bottom:6px;}
+  .qtext{font-size:16.5px;font-weight:700;color:var(--navy);margin-bottom:16px;line-height:1.4;}
+  .opt{display:block;width:100%;text-align:left;background:#FBF9F4;border:2px solid #EDE3CC;border-radius:14px;padding:13px 16px;margin-bottom:10px;font-family:'Nunito',sans-serif;font-size:14.5px;font-weight:700;color:var(--navy);cursor:pointer;transition:.15s;}
+  .opt:hover{border-color:var(--turquesa);}
+  .opt.correct{background:#F1FBF6;border-color:var(--verde);color:#1c6b45;}
+  .opt.wrong{background:#FFF1F1;border-color:var(--coral);color:#a83a3a;}
+  .opt:disabled{cursor:default;}
+  .explain{display:none;margin-top:14px;padding:14px 16px;background:#FFF8EC;border-left:4px solid var(--dorado);border-radius:8px;font-size:13.5px;line-height:1.5;}
+  .explain.show{display:block;animation:rise .3s ease;}
+  @keyframes rise{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+  .btn{margin-top:16px;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:15px;background:linear-gradient(145deg,var(--turquesa),var(--turquesa-dark));color:#fff;border:none;border-radius:999px;padding:11px 26px;cursor:pointer;box-shadow:0 4px 0 var(--turquesa-dark);display:none;}
+  .btn.show{display:inline-block;}
+  .btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--turquesa-dark);}
+  .result{display:none;text-align:center;}
+  .result.show{display:block;animation:rise .4s ease;}
+  .result h2{font-family:'Baloo 2',sans-serif;color:var(--dorado-dark);font-size:26px;margin-bottom:8px;}
+  .result p{font-size:15px;line-height:1.6;}
+  .score{font-family:'Baloo 2',sans-serif;font-size:44px;font-weight:800;color:var(--turquesa-dark);margin:12px 0;}
+  footer{margin-top:24px;text-align:center;font-size:12px;color:#9AA7B3;font-weight:700;}
+  footer b{color:var(--turquesa-dark);}
+</style></head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Guía Directores · Educación Secundaria</p>
+    <h1>🎯 Ponte a Prueba</h1>
+  </header>
+  <div class="progress" id="progress"></div>
+  <div class="card" id="card"></div>
+  <div class="result" id="result">
+    <h2>🌟 ¡Terminaste!</h2>
+    <div class="score" id="scoreText"></div>
+    <p id="resultMsg"></p>
+    <button class="btn show" onclick="startQuiz()">Reintentar</button>
+  </div>
+  <footer>2026-2027 · <b>EnciendeIA</b> · Guía Directores Secundaria</footer>
+</div>
+<script>
+const QUESTIONS = [{"q": "Durante el receso, un alumno se lastima y necesita revisión médica, mientras un supervisor espera en la dirección por documentación pendiente. ¿Qué debe priorizar la directora?", "options": ["Atender primero al supervisor por jerarquía", "Priorizar la atención médica del alumno de inmediato", "Pedir al supervisor que espere sin dar explicación"], "correct": 1, "explain": "La LGDNNA da prioridad a la protección de la integridad de NNA sobre cualquier asunto administrativo."}, {"q": "El cuarto eje articulador de la Nueva Escuela Mexicana es:", "options": ["La evaluación estandarizada", "La autonomía profesional del magisterio", "La supervisión externa constante"], "correct": 1, "explain": "La autonomía profesional del magisterio permite contextualizar decisiones pedagógicas."}, {"q": "¿Cuál es el orden correcto de los tres planos del Programa Analítico?", "options": ["Codiseño → Contextualización → Lectura de la realidad", "Lectura de la realidad → Contextualización → Codiseño", "Contextualización → Codiseño → Lectura de la realidad"], "correct": 1, "explain": "Primero se diagnostica, después se contextualiza lo existente, y solo entonces se codiseña contenido nuevo."}, {"q": "El Comité de Planeación y Evaluación del CTE tiene como función:", "options": ["Organizar festivales escolares", "Supervisar la asistencia diaria del personal", "Sistematizar el diagnóstico socioeducativo"], "correct": 2, "explain": "Sistematizar el diagnóstico es función del Comité; festivales y asistencia son tareas administrativas distintas."}, {"q": "Una retroalimentación docente efectiva, dada por la dirección, debe ser clara, oportuna, específica y orientada a la:", "options": ["Sanción administrativa", "Mejora", "Calificación numérica final"], "correct": 1, "explain": "La cuarta característica es estar orientada a la mejora, proponiendo un siguiente paso concreto."}, {"q": "¿Cuál es la primera acción correcta ante señales de posible acoso escolar?", "options": ["Sancionar al presunto responsable", "Detectar y documentar las señales", "Suspender al alumno afectado"], "correct": 1, "explain": "El protocolo inicia con detección y documentación, nunca con sanción inmediata."}, {"q": "El protocolo de atención al acoso escolar sigue el orden: detección, notificación, ____ y seguimiento.", "options": ["Sanción inmediata", "Intervención", "Expulsión"], "correct": 1, "explain": "El orden correcto es detección, notificación, intervención y seguimiento."}, {"q": "Un caso de salud mental de un alumno rebasa las capacidades del plantel. ¿Qué debe hacer el director?", "options": ["Manejarlo solo con el personal docente disponible", "Canalizar a instituciones de salud competentes y dar seguimiento", "Esperar a que se resuelva por sí solo"], "correct": 1, "explain": "Cuando un caso rebasa las capacidades del plantel, se canaliza a instituciones externas competentes."}, {"q": "El liderazgo educativo, según el enfoque de UNESCO, implica que el director actúe como:", "options": ["Sustituto de las autoridades externas", "Articulador de redes con instituciones externas", "Supervisor único de todos los procesos"], "correct": 1, "explain": "El liderazgo educativo articula redes de colaboración externa, no concentra toda la responsabilidad en el plantel."}, {"q": "La vinculación escuela-familias, según el enfoque de la NEM, debe reconocer que existen:", "options": ["Estructuras familiares idénticas", "Estructuras familiares diversas", "Estructuras familiares jerárquicas"], "correct": 1, "explain": "La NEM reconoce la diversidad de familias como parte del enfoque de derechos."}];
+let current = 0, score = 0, answered = false;
+
+function buildProgress(){
+  const p = document.getElementById('progress');
+  p.innerHTML = '';
+  QUESTIONS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i===current ? ' current' : '') + (i<current ? ' done' : '');
+    d.textContent = i+1;
+    d.id = 'dot-'+i;
+    p.appendChild(d);
+  });
+}
+
+function renderQuestion(){
+  answered = false;
+  document.getElementById('result').classList.remove('show');
+  document.getElementById('card').style.display = 'block';
+  const q = QUESTIONS[current];
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="qnum">Pregunta ${current+1} de ${QUESTIONS.length}</div>
+    <div class="qtext">${q.q}</div>
+    <div id="opts"></div>
+    <div class="explain" id="explain">${q.explain}</div>
+    <button class="btn" id="nextBtn" onclick="nextQuestion()">${current === QUESTIONS.length-1 ? 'Ver resultado' : 'Siguiente'}</button>
+  `;
+  const optsDiv = document.getElementById('opts');
+  q.options.forEach((opt, idx) => {
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.textContent = opt;
+    b.onclick = () => selectOption(idx);
+    optsDiv.appendChild(b);
+  });
+  buildProgress();
+}
+
+function selectOption(idx){
+  if(answered) return;
+  answered = true;
+  const q = QUESTIONS[current];
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((b, i) => {
+    b.disabled = true;
+    if(i === q.correct) b.classList.add('correct');
+    else if(i === idx) b.classList.add('wrong');
+  });
+  if(idx === q.correct) score++;
+  document.getElementById('explain').classList.add('show');
+  document.getElementById('nextBtn').classList.add('show');
+}
+
+function nextQuestion(){
+  if(current < QUESTIONS.length-1){
+    current++;
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult(){
+  document.getElementById('card').style.display = 'none';
+  document.getElementById('progress').innerHTML = '';
+  const result = document.getElementById('result');
+  result.classList.add('show');
+  document.getElementById('scoreText').textContent = score + ' / ' + QUESTIONS.length;
+  let msg = '';
+  if(score === QUESTIONS.length) msg = '¡Perfecto! Dominas estos temas — sigue así hasta el examen.';
+  else if(score >= QUESTIONS.length*0.7) msg = 'Muy bien — repasa las que fallaste en la guía completa antes del examen.';
+  else msg = 'Vas por buen camino — repasa con calma las subáreas de la guía y vuelve a intentarlo.';
+  document.getElementById('resultMsg').textContent = msg;
+}
+
+function startQuiz(){
+  current = 0; score = 0;
+  renderQuestion();
+}
+
+startQuiz();
+</script>
+</body></html>
