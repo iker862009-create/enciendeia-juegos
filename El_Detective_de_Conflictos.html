@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>El Detective de Conflictos</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@600;700;800&display=swap');
+  :root{
+    --turquesa:#00B4D8; --turquesa-dark:#0088A8; --dorado:#F4A100; --dorado-dark:#C97F00;
+    --crema:#FFF8EC; --navy:#1B3A5C; --verde:#3FBF7F; --coral:#FF6B6B;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:
+      radial-gradient(circle at 15% 20%, rgba(244,161,0,0.13), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(0,180,216,0.15), transparent 45%),
+      var(--crema);
+    font-family:'Nunito',sans-serif;color:var(--navy);display:flex;flex-direction:column;align-items:center;padding:24px 16px 40px;}
+  .wrap{width:100%;max-width:600px;}
+  header{text-align:center;margin-bottom:14px;}
+  .eyebrow{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dorado-dark);margin:0 0 4px;}
+  h1{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(20px,5.5vw,28px);margin:0 0 6px;color:var(--navy);}
+  .levelbar{display:flex;gap:5px;margin:14px 0;justify-content:center;flex-wrap:wrap;}
+  .dot{width:20px;height:20px;border-radius:50%;background:#fff;border:2.5px solid #E6DDCC;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#bbb;transition:.3s;}
+  .dot.done{background:var(--verde);border-color:var(--verde);color:#fff;}
+  .dot.current{border-color:var(--turquesa);color:var(--turquesa-dark);transform:scale(1.2);}
+  .card{background:#fff;border-radius:20px;padding:22px 20px;box-shadow:0 8px 24px rgba(27,58,92,.10);border:2px solid #F0E6D2;}
+  .tag{display:inline-block;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:var(--navy);border-radius:999px;padding:4px 12px;margin-bottom:10px;}
+  .prompt{font-size:15.5px;font-weight:700;color:var(--navy);margin-bottom:14px;line-height:1.4;background:#FBF3E4;border-radius:12px;padding:12px 14px;}
+  .opt{display:block;width:100%;text-align:left;background:#FBF9F4;border:2px solid #EDE3CC;border-radius:14px;padding:12px 14px;margin-bottom:9px;font-family:'Nunito',sans-serif;font-size:13.5px;font-weight:700;color:var(--navy);cursor:pointer;transition:.15s;}
+  .opt:hover{border-color:var(--turquesa);}
+  .opt.correct{background:#F1FBF6;border-color:var(--verde);color:#1c6b45;}
+  .opt.wrong{background:#FFF1F1;border-color:var(--coral);color:#a83a3a;}
+  .opt:disabled{cursor:default;}
+  .explain{display:none;margin-top:12px;padding:12px 14px;background:#FFF8EC;border-left:4px solid var(--dorado);border-radius:8px;font-size:13px;line-height:1.5;}
+  .explain.show{display:block;animation:rise .3s ease;}
+  @keyframes rise{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+  .btn{margin-top:14px;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:14px;background:linear-gradient(145deg,var(--turquesa),var(--turquesa-dark));color:#fff;border:none;border-radius:999px;padding:10px 24px;cursor:pointer;box-shadow:0 4px 0 var(--turquesa-dark);display:none;}
+  .btn.show{display:inline-block;}
+  .btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--turquesa-dark);}
+  .result{display:none;text-align:center;}
+  .result.show{display:block;animation:rise .4s ease;}
+  .result h2{font-family:'Baloo 2',sans-serif;color:var(--dorado-dark);font-size:24px;margin-bottom:6px;}
+  .score{font-family:'Baloo 2',sans-serif;font-size:40px;font-weight:800;color:var(--turquesa-dark);margin:10px 0;}
+  footer{margin-top:20px;text-align:center;font-size:11px;color:#9AA7B3;font-weight:700;}
+  footer b{color:var(--turquesa-dark);}
+</style></head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">4° Primaria · Proyecto 1</p>
+    <h1>🔍 El Detective de Conflictos</h1>
+  </header>
+  <div class="levelbar" id="levelbar"></div>
+  <div class="card" id="card"></div>
+  <div class="result" id="result">
+    <h2>🏆 ¡Caso resuelto!</h2>
+    <div class="score" id="scoreText"></div>
+    <p id="resultMsg"></p>
+    <button class="btn show" onclick="start()">Jugar de nuevo</button>
+  </div>
+  <footer>2026-2027 · <b>EnciendeIA</b> · Planeación 4° Primaria</footer>
+</div>
+<script>
+const CHALLENGES = [{"situacion": "Dos compañeros se pelean porque uno cree que el otro copió su tarea sin preguntar.", "opciones": ["Falta de comunicación: no se pidió permiso antes de usar el trabajo de alguien más.", "Le caen mal el uno al otro sin ninguna razón.", "Uno de los dos quiere llamar la atención del grupo."], "correcta": 0, "explicacion": "La causa real es no haber pedido permiso antes — un problema de comunicación, no de que 'se caigan mal'."}, {"situacion": "Un equipo se molesta porque solo dos personas hicieron todo el trabajo del proyecto y los demás no ayudaron.", "opciones": ["El equipo tiene mala suerte.", "Reparto desigual de responsabilidades: no se organizaron las tareas desde el inicio.", "A los que trabajaron les gusta quejarse."], "correcta": 1, "explicacion": "No repartir tareas claras desde el inicio es una causa común y evitable de este tipo de conflicto."}, {"situacion": "Un alumno se enoja porque siente que sus ideas nunca se toman en cuenta en las decisiones del grupo.", "opciones": ["Falta de espacios reales para que todos opinen antes de decidir.", "Ese alumno es demasiado sensible.", "Al grupo no le interesa lo que piensa nadie."], "correcta": 0, "explicacion": "Cuando no hay un momento claro para que todos opinen, es normal que alguien sienta que no lo escuchan — es un problema de proceso, no de sensibilidad."}, {"situacion": "Dos amigos dejan de hablarse después de un malentendido en un chat de grupo, donde un mensaje se interpretó de forma distinta a como se quiso decir.", "opciones": ["Los mensajes de texto sin tono de voz o gestos pueden malinterpretarse fácilmente.", "Ya no eran realmente amigos desde antes.", "Uno de los dos miente sobre lo que sintió."], "correcta": 0, "explicacion": "La comunicación por texto pierde tono y gestos, lo que genera malentendidos reales sin que nadie mienta."}, {"situacion": "Un grupo se molesta porque alguien siempre llega tarde a los ensayos y retrasa a todos.", "opciones": ["Falta de acuerdo claro sobre horarios y consecuencias de no cumplirlos.", "A esa persona no le importa nada el proyecto.", "El grupo exagera, no es para tanto."], "correcta": 0, "explicacion": "Sin un acuerdo claro sobre horarios (y qué pasa si no se cumplen), es fácil que surjan retrasos repetidos sin mala intención."}, {"situacion": "Dos alumnos discuten porque tienen opiniones distintas sobre cómo resolver un problema de matemáticas, y cada uno insiste en que solo su método es correcto.", "opciones": ["Falta de espacio para explicar y comparar ambos métodos antes de decidir cuál usar.", "Uno de los dos no sabe matemáticas.", "Se pelean porque quieren competir entre ellos."], "correcta": 0, "explicacion": "Comparar métodos con calma, sin descartar de entrada la idea del otro, resuelve el conflicto sin necesidad de que alguien 'pierda'."}];
+
+let current = 0, score = 0, answered = false;
+
+function buildLevelbar(){
+  const p = document.getElementById('levelbar');
+  p.innerHTML = '';
+  CHALLENGES.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i===current ? ' current' : '') + (i<current ? ' done' : '');
+    d.textContent = i+1;
+    p.appendChild(d);
+  });
+}
+
+function render(){
+  answered = false;
+  document.getElementById('result').classList.remove('show');
+  document.getElementById('card').style.display = 'block';
+  const ch = CHALLENGES[current];
+  const card = document.getElementById('card');
+  buildLevelbar();
+  card.innerHTML = `
+    <span class="tag">Caso a investigar</span>
+    <div class="prompt">"${ch.situacion}"<br><small>¿Cuál es la causa real de este conflicto?</small></div>
+    <div id="opts"></div>
+    <div class="explain" id="explain">${ch.explicacion}</div>
+    <button class="btn" id="nextBtn" onclick="next()">${current === CHALLENGES.length-1 ? 'Ver resultado' : 'Siguiente'}</button>
+  `;
+  const optsDiv = document.getElementById('opts');
+  ch.opciones.forEach((opt, idx) => {
+    const b = document.createElement('button');
+    b.className = 'opt'; b.textContent = opt;
+    b.onclick = () => selectOption(idx, ch.correcta);
+    optsDiv.appendChild(b);
+  });
+}
+
+function selectOption(idx, correctIdx){
+  if(answered) return;
+  answered = true;
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((b, i) => {
+    b.disabled = true;
+    if(i === correctIdx) b.classList.add('correct');
+    else if(i === idx) b.classList.add('wrong');
+  });
+  if(idx === correctIdx) score++;
+  document.getElementById('explain').classList.add('show');
+  document.getElementById('nextBtn').classList.add('show');
+}
+
+function next(){
+  if(current < CHALLENGES.length-1){
+    current++;
+    render();
+  } else {
+    showResult();
+  }
+}
+
+function showResult(){
+  document.getElementById('card').style.display = 'none';
+  document.getElementById('levelbar').innerHTML = '';
+  const result = document.getElementById('result');
+  result.classList.add('show');
+  document.getElementById('scoreText').textContent = score + ' / ' + CHALLENGES.length;
+  let msg = '';
+  if(score === CHALLENGES.length) msg = '¡Excelente detective! Identificas causas reales de conflicto, no solo síntomas.';
+  else if(score >= CHALLENGES.length*0.6) msg = 'Muy bien — revisa con tu equipo los casos que fallaste antes de escribir el Decálogo.';
+  else msg = 'Buen intento — repasa con tu maestro cómo distinguir la causa real de un conflicto.';
+  document.getElementById('resultMsg').textContent = msg;
+}
+
+function start(){
+  current = 0; score = 0;
+  render();
+}
+
+start();
+</script>
+</body></html>
