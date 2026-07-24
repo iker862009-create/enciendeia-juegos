@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿Quién Trabaja en mi Escuela? — 1er Grado</title>
+<style>
+  :root { --teal:#0096BC; --teal-dark:#006583; --navy:#1B3A5C; --gold:#FFB300; --coral:#FF6F61; --green:#4CBB6F; --purple:#9575CD; --cream:#FFFAEB; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:'Segoe UI',system-ui,sans-serif; background:linear-gradient(180deg,var(--teal) 0%,var(--teal-dark) 100%); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:20px; }
+  .bunting { display:flex; width:100%; max-width:560px; height:24px; margin-bottom:10px; }
+  .bunting div { flex:1; height:0; border-left:16px solid transparent; border-right:16px solid transparent; border-top:24px solid; }
+  h1 { color:white; font-size:1.6rem; margin:8px 0 2px; text-align:center; }
+  .sub { color:#FFE7B0; margin-bottom:14px; font-weight:600; }
+  .board { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; max-width:520px; width:100%; }
+  .tile {
+    aspect-ratio:1; background:white; border-radius:16px; display:flex; align-items:center; justify-content:center;
+    font-size:2.2rem; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.2); transition:transform 0.2s;
+    user-select:none;
+  }
+  .tile.hidden-face { background:var(--navy); color:var(--gold); font-size:1.8rem; }
+  .tile.matched { background:#DFF5E5; box-shadow:none; opacity:0.7; cursor:default; }
+  .progress { color:white; margin-top:16px; font-weight:600; }
+  .stars { font-size:2.5rem; text-align:center; margin:16px 0; }
+  .next-btn { display:block; margin:16px auto 0; background:var(--gold); color:white; border:none; border-radius:30px; padding:14px 32px; font-size:1.1rem; font-weight:700; cursor:pointer; }
+  footer { color:#D6EEF5; margin-top:20px; font-size:0.85rem; text-align:center; }
+</style>
+</head>
+<body>
+  <div class="bunting" id="bunting"></div>
+  <h1>🦒 ¿Quién Trabaja en mi Escuela? 🐒</h1>
+  <div class="sub">1er Grado · Proyecto 3 · Memorama</div>
+  <div class="board" id="board"></div>
+  <div class="progress" id="progress">Encuentra los 6 pares</div>
+  <div id="finishArea"></div>
+  <footer>EnciendeIA · Planeaciones NEM</footer>
+
+<script>
+const colors = ['#FF6F61','#FFB300','#4CBB6F','#0096BC','#9575CD'];
+const b = document.getElementById('bunting');
+for (let i=0;i<12;i++){ const d=document.createElement('div'); d.style.borderTopColor=colors[i%5]; b.appendChild(d); }
+
+const pairs = [
+  ['👩‍🏫','📚'], // maestra - libros
+  ['👨‍🍳','🍎'], // cocinero - comida
+  ['🧹','🧽'], // conserje - limpieza
+  ['👔','📋'], // director - documentos
+  ['👮','🚪'], // vigilancia - puerta
+  ['👩‍⚕️','❤️'], // enfermera - salud
+];
+
+let cards = [];
+pairs.forEach((p,i) => { cards.push({id:i,emoji:p[0]}); cards.push({id:i,emoji:p[1]}); });
+cards = cards.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]);
+
+let flipped = [];
+let matched = 0;
+let lock = false;
+
+function render() {
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+  cards.forEach((c, idx) => {
+    const t = document.createElement('div');
+    t.className = 'tile hidden-face';
+    t.textContent = '❓';
+    t.dataset.idx = idx;
+    t.onclick = () => flip(idx);
+    board.appendChild(t);
+  });
+}
+
+function flip(idx) {
+  if (lock) return;
+  const tiles = document.querySelectorAll('.tile');
+  const tile = tiles[idx];
+  if (tile.classList.contains('matched') || flipped.includes(idx)) return;
+  tile.classList.remove('hidden-face');
+  tile.textContent = cards[idx].emoji;
+  flipped.push(idx);
+  if (flipped.length === 2) {
+    lock = true;
+    const [a,b] = flipped;
+    if (cards[a].id === cards[b].id) {
+      setTimeout(() => {
+        tiles[a].classList.add('matched');
+        tiles[b].classList.add('matched');
+        matched++;
+        flipped = [];
+        lock = false;
+        document.getElementById('progress').textContent = `Pares encontrados: ${matched} de ${pairs.length}`;
+        if (matched === pairs.length) finish();
+      }, 500);
+    } else {
+      setTimeout(() => {
+        tiles[a].classList.add('hidden-face'); tiles[a].textContent='❓';
+        tiles[b].classList.add('hidden-face'); tiles[b].textContent='❓';
+        flipped = [];
+        lock = false;
+      }, 900);
+    }
+  }
+}
+
+function finish() {
+  document.getElementById('finishArea').innerHTML = `
+    <div class="stars">⭐⭐⭐⭐⭐</div>
+    <div style="color:white;text-align:center;font-size:1.2rem;font-weight:700;">¡Encontraste todos los pares! 🎉</div>
+    <button class="next-btn" onclick="location.reload()">Jugar de nuevo</button>
+  `;
+}
+
+render();
+</script>
+</body>
+</html>

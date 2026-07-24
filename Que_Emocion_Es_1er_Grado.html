@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿Qué Emoción Es? — 1er Grado</title>
+<style>
+  :root { --teal:#0096BC; --teal-dark:#006583; --navy:#1B3A5C; --gold:#FFB300; --coral:#FF6F61; --green:#4CBB6F; --purple:#9575CD; --cream:#FFFAEB; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:'Segoe UI',system-ui,sans-serif; background:linear-gradient(180deg,var(--teal) 0%,var(--teal-dark) 100%); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:20px; color:var(--navy); }
+  .bunting { display:flex; width:100%; max-width:700px; height:24px; margin-bottom:10px; }
+  .bunting div { flex:1; height:0; border-left:20px solid transparent; border-right:20px solid transparent; border-top:24px solid; }
+  h1 { color:white; font-size:1.8rem; margin:10px 0 4px; text-align:center; }
+  .sub { color:#FFE7B0; margin-bottom:16px; font-weight:600; }
+  .card { background:white; border-radius:24px; padding:24px; max-width:700px; width:100%; box-shadow:0 8px 24px rgba(0,0,0,0.15); text-align:center; }
+  .scene { font-size:5rem; margin-bottom:10px; }
+  .scene-text { font-size:1.15rem; margin-bottom:20px; color:var(--navy); font-weight:600; }
+  .options { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .opt { border:4px solid var(--teal); border-radius:16px; padding:16px 6px; font-size:0.95rem; background:var(--cream); cursor:pointer; transition:transform 0.15s; }
+  .opt:active { transform:scale(0.95); }
+  .opt .emoji { font-size:2.5rem; display:block; margin-bottom:6px; }
+  .opt.correct { background:#DFF5E5; border-color:var(--green); }
+  .opt.wrong { background:#FFE3E0; border-color:var(--coral); }
+  .feedback { text-align:center; font-size:1.3rem; font-weight:700; margin-top:16px; min-height:40px; }
+  .next-btn { display:block; margin:16px auto 0; background:var(--gold); color:white; border:none; border-radius:30px; padding:14px 32px; font-size:1.1rem; font-weight:700; cursor:pointer; }
+  .progress { color:white; margin-top:14px; font-weight:600; }
+  .stars { font-size:2.5rem; text-align:center; margin:20px 0; }
+  footer { color:#D6EEF5; margin-top:20px; font-size:0.85rem; text-align:center; }
+</style>
+</head>
+<body>
+  <div class="bunting" id="bunting"></div>
+  <h1>🐘 ¿Qué Emoción Es? 🦁</h1>
+  <div class="sub">1er Grado · Proyecto 4</div>
+  <div class="card"><div id="game"></div></div>
+  <div class="progress" id="progress"></div>
+  <footer>EnciendeIA · Planeaciones NEM</footer>
+
+<script>
+const colors = ['#FF6F61','#FFB300','#4CBB6F','#0096BC','#9575CD'];
+const b = document.getElementById('bunting');
+for (let i=0;i<15;i++){ const d=document.createElement('div'); d.style.borderTopColor=colors[i%5]; b.appendChild(d); }
+
+const rounds = [
+  { scene:"😀", text:"Tu amigo sonríe mucho porque le regalaron un juguete nuevo.", options:[
+    {emoji:"😊",label:"Alegría",correct:true},{emoji:"😢",label:"Tristeza",correct:false},{emoji:"😠",label:"Enojo",correct:false}]},
+  { scene:"😭", text:"Se le rompió su dibujo favorito y llora.", options:[
+    {emoji:"😊",label:"Alegría",correct:false},{emoji:"😢",label:"Tristeza",correct:true},{emoji:"😨",label:"Miedo",correct:false}]},
+  { scene:"😤", text:"Alguien le quitó su lápiz sin pedirlo y frunce el ceño.", options:[
+    {emoji:"😠",label:"Enojo",correct:true},{emoji:"😊",label:"Alegría",correct:false},{emoji:"😢",label:"Tristeza",correct:false}]},
+  { scene:"😱", text:"Escuchó un trueno muy fuerte y se abraza a su mochila.", options:[
+    {emoji:"😨",label:"Miedo",correct:true},{emoji:"😠",label:"Enojo",correct:false},{emoji:"😊",label:"Alegría",correct:false}]},
+  { scene:"🥺", text:"Su mejor amiga está triste y él la abraza para acompañarla.", options:[
+    {emoji:"🤗",label:"Ayudar a un triste",correct:true},{emoji:"😆",label:"Reírse de ella",correct:false},{emoji:"🙈",label:"Ignorarla",correct:false}]},
+];
+
+let idx=0, score=0, answered=false;
+function shuffle(a){return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);}
+
+function render(){
+  answered=false;
+  const r = rounds[idx];
+  const opts = shuffle(r.options);
+  document.getElementById('game').innerHTML = `
+    <div class="scene">${r.scene}</div>
+    <div class="scene-text">${r.text}</div>
+    <div class="options">
+      ${opts.map(o=>`<div class="opt" data-correct="${o.correct}" onclick="pick(this)"><span class="emoji">${o.emoji}</span>${o.label}</div>`).join('')}
+    </div>
+    <div class="feedback" id="feedback"></div>
+  `;
+  document.getElementById('progress').textContent = `Situación ${idx+1} de ${rounds.length} · ⭐ ${score}`;
+}
+
+function pick(el){
+  if (answered) return;
+  answered = true;
+  const correct = el.dataset.correct === "true";
+  document.querySelectorAll('.opt').forEach(o=>{ if(o.dataset.correct==="true") o.classList.add('correct'); });
+  if (!correct) el.classList.add('wrong'); else score++;
+  document.getElementById('feedback').textContent = correct ? "¡Así es! 🎉" : "Casi — mira la opción verde 💚";
+  setTimeout(()=>{ idx++; if(idx<rounds.length) render(); else finish(); }, 1400);
+}
+
+function finish(){
+  document.getElementById('game').innerHTML = `
+    <div class="stars">${'⭐'.repeat(Math.max(1,Math.round(score/rounds.length*5)))}</div>
+    <div class="feedback">¡Terminaste! Acertaste ${score} de ${rounds.length}</div>
+    <button class="next-btn" onclick="idx=0;score=0;render();">Jugar de nuevo</button>
+  `;
+  document.getElementById('progress').textContent='';
+}
+render();
+</script>
+</body>
+</html>
