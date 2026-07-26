@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Escenario del Arrecife</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Comic Sans MS', 'Trebuchet MS', sans-serif;
+    background: linear-gradient(180deg, #8fe3f0 0%, #2a9fc0 55%, #0d5c73 100%);
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    padding: 20px; color: #fff;
+  }
+  h1 { text-align: center; font-size: 1.5em; text-shadow: 2px 2px 0 #0d5c73; margin: 6px 0; }
+  .sub { text-align: center; opacity: 0.95; margin-bottom: 14px; max-width: 460px; }
+  .progress { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; justify-content: center; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.3); }
+  .dot.done { background: #FFB300; }
+  .card {
+    background: white; color: #0d5c73; border-radius: 20px; padding: 22px; max-width: 460px;
+    width: 100%; font-size: 1.15em; text-align: center; box-shadow: 0 6px 0 #0a4a5c; margin-bottom: 14px;
+    font-weight: bold;
+  }
+  .options { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 460px; }
+  .opt-btn {
+    padding: 14px; border-radius: 14px; border: none; background: #e8f7fb; color: #0d5c73;
+    font-size: 1em; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #b8dfe8;
+  }
+  .feedback { min-height: 30px; font-size: 1.2em; margin: 12px 0; text-align: center; }
+  .end-screen { display: none; text-align: center; }
+  .end-screen h2 { font-size: 1.6em; }
+  .restart {
+    margin-top: 20px; padding: 14px 28px; background: #FFB300; color: #0d5c73;
+    border: none; border-radius: 30px; font-size: 1.1em; font-weight: bold; cursor: pointer;
+    box-shadow: 0 6px 0 #b57900;
+  }
+</style>
+</head>
+<body>
+<h1>🐠 El Escenario del Arrecife</h1>
+<p class="sub">Nemi quiere repasar todo lo que aprendieron este trimestre antes de la función final.</p>
+<div class="progress" id="progress"></div>
+
+<div id="game">
+  <div class="card" id="qText"></div>
+  <div class="options" id="options"></div>
+  <div class="feedback" id="feedback"></div>
+</div>
+
+<div class="end-screen" id="endScreen">
+  <div style="font-size:3.5em">🐠🎭</div>
+  <h2>¡Listos para la función y el examen del trimestre!</h2>
+  <p id="scoreText"></p>
+  <button class="restart" onclick="restart()">Jugar de nuevo</button>
+</div>
+
+<script>
+const questions = [
+  { q: "¿Por qué es mejor construir un acuerdo entre todos que recibir una regla impuesta?", opts: ["Porque lo entendemos y respetamos mejor", "Porque es más rápido", "Porque nadie tiene que participar"], correct: 0 },
+  { q: "¿Cuál es el primer paso para hacer las paces cuando hay un conflicto?", opts: ["Ignorar al otro", "Contar cómo me siento", "Buscar quién tiene la culpa"], correct: 1 },
+  { q: "¿Qué necesita casi todo ser vivo para estar bien?", opts: ["Agua, alimento y cuidado", "Solo estar solo", "Nada, se cuidan solos"], correct: 0 },
+  { q: "¿A quién le preguntamos sobre saberes y costumbres de antes?", opts: ["A un familiar mayor", "A un desconocido", "A nadie, se inventa"], correct: 0 },
+  { q: "¿Cuál de estas acciones ayuda a cuidar la naturaleza?", opts: ["Dejar la llave abierta", "Reciclar y cerrar la llave", "Tirar basura en el patio"], correct: 1 },
+  { q: "Nosotros somos parte de la naturaleza, no solo espectadores. ¿Verdadero o falso?", opts: ["Verdadero", "Falso", "Depende del día"], correct: 0 },
+  { q: "¿Cómo mostramos todo lo que aprendimos este trimestre?", opts: ["Con un examen escrito larguísimo", "Con una obra de teatro guiñol", "No lo mostramos"], correct: 1 },
+  { q: "Cuando dos personas no están de acuerdo, ¿qué es mejor que gritar?", opts: ["Dialogar y escuchar", "Pelear", "Quedarse callado para siempre"], correct: 0 },
+];
+
+let order = [], current = 0, score = 0;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildProgress() {
+  const p = document.getElementById('progress');
+  p.innerHTML = '';
+  questions.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot'; d.id = 'dot' + i;
+    p.appendChild(d);
+  });
+}
+
+function showQuestion() {
+  if (current >= order.length) return endGame();
+  const q = order[current];
+  document.getElementById('qText').textContent = q.q;
+  const optDiv = document.getElementById('options');
+  optDiv.innerHTML = '';
+  document.getElementById('feedback').textContent = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = opt;
+    btn.onclick = () => answer(i);
+    optDiv.appendChild(btn);
+  });
+}
+
+function answer(i) {
+  const q = order[current];
+  const fb = document.getElementById('feedback');
+  if (i === q.correct) {
+    score++;
+    fb.textContent = '¡Correcto! 🎉';
+    fb.style.color = '#FFB300';
+  } else {
+    fb.textContent = 'Casi — repásalo con tu grupo 🤔';
+    fb.style.color = '#ffdada';
+  }
+  document.getElementById('dot' + current).classList.add('done');
+  current++;
+  setTimeout(showQuestion, 1100);
+}
+
+function endGame() {
+  document.getElementById('game').style.display = 'none';
+  document.getElementById('endScreen').style.display = 'block';
+  const pct = score / order.length;
+  document.getElementById('scoreText').textContent =
+    'Acertaste ' + score + ' de ' + order.length + '. ' +
+    (pct >= 0.8 ? '¡Están listos para el examen oral del trimestre!' : 'Repasen juntos los proyectos antes del examen oral.');
+}
+
+function restart() {
+  current = 0; score = 0;
+  order = shuffle(questions);
+  buildProgress();
+  document.getElementById('game').style.display = 'block';
+  document.getElementById('endScreen').style.display = 'none';
+  showQuestion();
+}
+
+restart();
+</script>
+</body>
+</html>
