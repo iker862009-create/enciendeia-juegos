@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<!-- saved from url=(0060)file:///C:/Users/dylan/Downloads/Rescate_en_el_Arrecife.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rescate en el Arrecife</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Comic Sans MS', 'Trebuchet MS', sans-serif;
+    background: linear-gradient(180deg, #7fd8e8 0%, #1a8fb0 60%, #0d5c73 100%);
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    padding: 20px; color: #fff; position: relative;
+  }
+  h1 { text-align: center; font-size: 1.6em; text-shadow: 2px 2px 0 #0d5c73; margin: 10px 0; }
+  .sub { text-align: center; opacity: 0.9; margin-bottom: 10px; max-width: 460px; }
+  .progress { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+  .dot { width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,0.3); }
+  .dot.done { background: #FFB300; }
+  .dot.wrong { background: #FF6F61; }
+  .card-row { display: flex; align-items: center; gap: 10px; max-width: 420px; width: 100%; margin-bottom: 24px; }
+  .card {
+    background: white; color: #0d5c73; border-radius: 24px; padding: 30px 24px;
+    flex: 1; text-align: center; font-size: 1.2em; font-weight: bold;
+    box-shadow: 0 8px 0 #0a4a5c; min-height: 100px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .speak-btn { background: #FFB300; color: #0d5c73; border: none; border-radius: 50%; width: 56px; height: 56px; font-size: 1.4em; cursor: pointer; box-shadow: 0 5px 0 #b57900; flex-shrink: 0; }
+  .buttons { display: flex; gap: 16px; width: 100%; max-width: 420px; }
+  button.choice { flex: 1; padding: 20px 10px; border: none; border-radius: 18px; font-size: 1em; font-weight: bold; cursor: pointer; box-shadow: 0 6px 0 rgba(0,0,0,0.2); color: white; }
+  .yes { background: #4CBB6F; } .no { background: #FF6F61; }
+  button.choice:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
+  .feedback { font-size: 1.4em; margin-top: 16px; min-height: 40px; text-align: center; }
+  .end-screen { display: none; text-align: center; max-width: 460px; }
+  .restart { margin-top: 20px; padding: 14px 28px; background: #FFB300; color: #0d5c73; border: none; border-radius: 30px; font-size: 1.1em; font-weight: bold; cursor: pointer; box-shadow: 0 6px 0 #b57900; }
+  .mute-btn { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 46px; height: 46px; font-size: 1.3em; cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(10,74,92,0.92); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+  .modal-box { background: white; color: #0d5c73; border-radius: 24px; padding: 30px; max-width: 420px; text-align: center; }
+  .modal-box button { margin-top: 16px; padding: 16px 32px; background: #4CBB6F; color: white; border: none; border-radius: 30px; font-size: 1.1em; font-weight: bold; cursor: pointer; box-shadow: 0 6px 0 #327d49; }
+  .miss-list { text-align: left; background: rgba(255,255,255,0.15); border-radius: 14px; padding: 14px 18px; margin-top: 14px; font-size: 0.95em; }
+  .miss-list div { margin-bottom: 8px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
+<div class="modal-overlay" id="introModal">
+  <div class="modal-box">
+    <div style="font-size:3em">🐳</div>
+    <h2>Cómo se juega</h2>
+    <p>Balu te va a leer una acción. Toca "Ayuda" si ayuda a la naturaleza, o "Daña" si le hace daño.</p>
+    <button onclick="closeIntro()">¡Empezar! 🎮</button>
+  </div>
+</div>
+<h1>🐳 Rescate en el Arrecife</h1>
+<p class="sub">Balu necesita saber: ¿esta acción ayuda a la naturaleza, o le hace daño?</p>
+<div class="progress" id="progress"></div>
+
+<div id="game" class="hidden">
+  <div class="card-row">
+    <div class="card" id="cardText">Cargando...</div>
+    <button class="speak-btn" onclick="speak(order[current].text)">🔊</button>
+  </div>
+  <div class="buttons">
+    <button class="choice yes" onclick="answer(true)">🌿 Ayuda</button>
+    <button class="choice no" onclick="answer(false)">💔 Daña</button>
+  </div>
+  <div class="feedback" id="feedback"></div>
+</div>
+
+<div class="end-screen" id="endScreen">
+  <div style="font-size:3.5em">🐳🏆</div>
+  <h2>¡Rescate completado!</h2>
+  <p id="scoreText"></p>
+  <p>Acertaste <span id="finalScore"></span> de <span id="finalTotal"></span></p>
+  <div class="miss-list hidden" id="missList"></div>
+  <button class="restart" onclick="restart()">Jugar de nuevo</button>
+</div>
+
+<script>
+const items = [
+  { text: "Cerrar la llave mientras me lavo los dientes", correct: true },
+  { text: "Tirar basura en el patio de la escuela", correct: false },
+  { text: "Reciclar botellas de plástico", correct: true },
+  { text: "Dejar la luz encendida sin que nadie la necesite", correct: false },
+  { text: "Cuidar y regar una planta o un árbol", correct: true },
+  { text: "Cortar flores o ramas solo por diversión", correct: false },
+  { text: "Recoger basura que encuentro en la calle", correct: true },
+  { text: "Dejar correr el agua sin usarla", correct: false },
+];
+
+let order = [], current = 0, score = 0, muted = false, misses = [];
+
+function vibrate(pattern) { if (!muted && navigator.vibrate) { try { navigator.vibrate(pattern); } catch(e){} } }
+function speak(text) {
+  if (muted || !('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'es-MX'; u.rate = 0.95;
+  window.speechSynthesis.speak(u);
+}
+function toggleMute() {
+  muted = !muted;
+  document.getElementById('muteBtn').textContent = muted ? '🔇' : '🔊';
+  if (muted && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+function confettiBurst() {
+  const colors = ['#FFB300','#FF6F61','#4CBB6F','#9575CD','#ffffff'];
+  for (let i=0;i<40;i++){
+    const el = document.createElement('div');
+    const size = 6+Math.random()*8;
+    el.style.cssText = `position:fixed;top:-20px;left:${Math.random()*100}vw;width:${size}px;height:${size}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>0.5?'50%':'2px'};z-index:9999;pointer-events:none;`;
+    document.body.appendChild(el);
+    const duration = 2200+Math.random()*1500;
+    const rotate = (Math.random()>0.5?1:-1)*(Math.random()*360+180);
+    const drift = (Math.random()-0.5)*200;
+    el.animate([
+      { transform: `translate(0,0) rotate(0deg)`, opacity:1 },
+      { transform: `translate(${drift}px, 100vh) rotate(${rotate}deg)`, opacity:0.4 }
+    ], { duration, easing:'ease-in' });
+    setTimeout(()=>el.remove(), duration);
+  }
+}
+function closeIntro() {
+  document.getElementById('introModal').style.display = 'none';
+  document.getElementById('game').classList.remove('hidden');
+  restart();
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildProgress() {
+  const p = document.getElementById('progress');
+  p.innerHTML = '';
+  items.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot'; d.id = 'dot' + i;
+    p.appendChild(d);
+  });
+}
+
+function showCard() {
+  if (current >= order.length) return endGame();
+  document.getElementById('cardText').textContent = order[current].text;
+  document.getElementById('feedback').textContent = '';
+  speak(order[current].text);
+}
+
+function answer(choice) {
+  const correct = order[current].correct === choice;
+  const fb = document.getElementById('feedback');
+  if (correct) {
+    score++;
+    fb.textContent = '¡Correcto! 🎉';
+    fb.style.color = '#FFB300';
+    vibrate(40);
+    document.getElementById('dot' + current).classList.add('done');
+  } else {
+    fb.textContent = order[current].correct ? 'Mmm, esto sí ayuda a la naturaleza 🤔' : 'Mmm, esto sí le hace daño 🤔';
+    fb.style.color = '#ffdada';
+    vibrate([30,60,30]);
+    document.getElementById('dot' + current).classList.add('wrong');
+    misses.push(order[current].text);
+  }
+  current++;
+  setTimeout(showCard, 1100);
+}
+
+function endGame() {
+  document.getElementById('game').style.display = 'none';
+  document.getElementById('endScreen').style.display = 'block';
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('finalTotal').textContent = order.length;
+  const pct = score / order.length;
+  document.getElementById('scoreText').textContent =
+    pct === 1 ? '¡Rescataste el arrecife por completo!' :
+    pct >= 0.6 ? '¡Muy bien! Ya sabes cuidar bien la naturaleza.' :
+    'Buen intento — repasa con tu grupo tu compromiso con la naturaleza y vuelve a intentarlo.';
+  if (misses.length) {
+    const ml = document.getElementById('missList');
+    ml.classList.remove('hidden');
+    ml.innerHTML = '<strong>Para repasar:</strong>' + misses.map(m => `<div>• ${m}</div>`).join('');
+  }
+  if (pct >= 0.8) confettiBurst();
+}
+
+function restart() {
+  current = 0; score = 0; misses = [];
+  order = shuffle(items);
+  buildProgress();
+  document.getElementById('game').style.display = 'block';
+  document.getElementById('endScreen').style.display = 'none';
+  document.getElementById('missList').classList.add('hidden');
+  showCard();
+}
+</script>
+
+
+</body></html>
