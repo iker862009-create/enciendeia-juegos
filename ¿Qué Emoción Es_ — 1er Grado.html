@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<!-- saved from url=(0062)file:///C:/Users/dylan/Downloads/Que_Emocion_Es_1er_Grado.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿Qué Emoción Es? — 1er Grado</title>
+<style>
+  :root { --teal:#0096BC; --teal-dark:#006583; --navy:#1B3A5C; --gold:#FFB300; --coral:#FF6F61; --green:#4CBB6F; --purple:#9575CD; --cream:#FFFAEB; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:'Segoe UI',system-ui,sans-serif; background:linear-gradient(180deg,var(--teal) 0%,var(--teal-dark) 100%); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:20px; color:var(--navy); position:relative; }
+  .bunting { display:flex; width:100%; max-width:700px; height:24px; margin-bottom:10px; }
+  .bunting div { flex:1; height:0; border-left:20px solid transparent; border-right:20px solid transparent; border-top:24px solid; }
+  h1 { color:white; font-size:1.8rem; margin:10px 0 4px; text-align:center; }
+  .sub { color:#FFE7B0; margin-bottom:16px; font-weight:600; }
+  .card { background:white; border-radius:24px; padding:24px; max-width:700px; width:100%; box-shadow:0 8px 24px rgba(0,0,0,0.15); text-align:center; }
+  .scene { font-size:5rem; margin-bottom:10px; }
+  .scene-text-row { display:flex; align-items:center; gap:10px; margin-bottom:20px; justify-content:center; }
+  .scene-text { font-size:1.15rem; color:var(--navy); font-weight:600; }
+  .speak-btn { background:var(--gold); color:var(--navy); border:none; border-radius:50%; width:46px; height:46px; font-size:1.2rem; cursor:pointer; box-shadow:0 4px 0 #b57900; flex-shrink:0; }
+  .options { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .opt { border:4px solid var(--teal); border-radius:16px; padding:16px 6px; font-size:0.95rem; background:var(--cream); cursor:pointer; transition:transform 0.15s; }
+  .opt:active { transform:scale(0.95); }
+  .opt .emoji { font-size:2.5rem; display:block; margin-bottom:6px; }
+  .opt.correct { background:#DFF5E5; border-color:var(--green); }
+  .opt.wrong { background:#FFE3E0; border-color:var(--coral); }
+  .feedback { text-align:center; font-size:1.3rem; font-weight:700; margin-top:16px; min-height:40px; }
+  .next-btn { display:block; margin:16px auto 0; background:var(--gold); color:white; border:none; border-radius:30px; padding:14px 32px; font-size:1.1rem; font-weight:700; cursor:pointer; }
+  .progress { color:white; margin-top:14px; font-weight:600; }
+  .stars { font-size:2.5rem; text-align:center; margin:20px 0; }
+  footer { color:#D6EEF5; margin-top:20px; font-size:0.85rem; text-align:center; }
+  .mute-btn { position:absolute; top:16px; right:16px; background:rgba(255,255,255,0.9); border:none; border-radius:50%; width:46px; height:46px; font-size:1.3em; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,0.2); }
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,60,80,0.9); display:flex; align-items:center; justify-content:center; z-index:1000; padding:20px; }
+  .modal-box { background:white; color:var(--navy); border-radius:24px; padding:28px; max-width:380px; text-align:center; }
+  .modal-box button { margin-top:14px; padding:14px 28px; background:var(--green); color:white; border:none; border-radius:999px; font-size:1.05em; font-weight:700; cursor:pointer; box-shadow:0 5px 0 #327d49; }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+  <button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
+  <div class="modal-overlay" id="introModal">
+    <div class="modal-box">
+      <div style="font-size:2.6em">🐘</div>
+      <h2>Cómo se juega</h2>
+      <p>Te van a leer una situación. Elige qué emoción siente el personaje.</p>
+      <button onclick="closeIntro()">¡Empezar! 🎮</button>
+    </div>
+  </div>
+  <div class="bunting" id="bunting"><div style="border-top-color: rgb(255, 111, 97);"></div><div style="border-top-color: rgb(255, 179, 0);"></div><div style="border-top-color: rgb(76, 187, 111);"></div><div style="border-top-color: rgb(0, 150, 188);"></div><div style="border-top-color: rgb(149, 117, 205);"></div><div style="border-top-color: rgb(255, 111, 97);"></div><div style="border-top-color: rgb(255, 179, 0);"></div><div style="border-top-color: rgb(76, 187, 111);"></div><div style="border-top-color: rgb(0, 150, 188);"></div><div style="border-top-color: rgb(149, 117, 205);"></div><div style="border-top-color: rgb(255, 111, 97);"></div><div style="border-top-color: rgb(255, 179, 0);"></div><div style="border-top-color: rgb(76, 187, 111);"></div><div style="border-top-color: rgb(0, 150, 188);"></div><div style="border-top-color: rgb(149, 117, 205);"></div></div>
+  <h1>🐘 ¿Qué Emoción Es? 🦁</h1>
+  <div class="sub">1er Grado · Proyecto 4</div>
+  <div class="card hidden" id="mainCard"><div id="game"></div></div>
+  <div class="progress" id="progress"></div>
+  <footer>EnciendeIA · Planeaciones NEM</footer>
+
+<script>
+const colors = ['#FF6F61','#FFB300','#4CBB6F','#0096BC','#9575CD'];
+const b = document.getElementById('bunting');
+for (let i=0;i<15;i++){ const d=document.createElement('div'); d.style.borderTopColor=colors[i%5]; b.appendChild(d); }
+
+let muted = false;
+function vibrate(pattern){ if(!muted && navigator.vibrate){ try{ navigator.vibrate(pattern); }catch(e){} } }
+function speak(text){
+  if(muted || !('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang='es-MX'; u.rate=0.9;
+  window.speechSynthesis.speak(u);
+}
+function toggleMute(){
+  muted=!muted;
+  document.getElementById('muteBtn').textContent = muted?'🔇':'🔊';
+  if(muted && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+function confettiBurst(){
+  const cs=['#FFB300','#FF6F61','#4CBB6F','#9575CD','#ffffff'];
+  for(let i=0;i<40;i++){
+    const el=document.createElement('div');
+    const size=6+Math.random()*8;
+    el.style.cssText=`position:fixed;top:-20px;left:${Math.random()*100}vw;width:${size}px;height:${size}px;background:${cs[Math.floor(Math.random()*cs.length)]};border-radius:${Math.random()>0.5?'50%':'2px'};z-index:9999;pointer-events:none;`;
+    document.body.appendChild(el);
+    const duration=2200+Math.random()*1500;
+    const rotate=(Math.random()>0.5?1:-1)*(Math.random()*360+180);
+    const drift=(Math.random()-0.5)*200;
+    el.animate([{transform:'translate(0,0) rotate(0deg)',opacity:1},{transform:`translate(${drift}px, 100vh) rotate(${rotate}deg)`,opacity:0.4}],{duration,easing:'ease-in'});
+    setTimeout(()=>el.remove(), duration);
+  }
+}
+function closeIntro(){
+  document.getElementById('introModal').style.display='none';
+  document.getElementById('mainCard').classList.remove('hidden');
+  render();
+}
+
+const rounds = [
+  { scene:"😀", text:"Tu amigo sonríe mucho porque le regalaron un juguete nuevo.", options:[
+    {emoji:"😊",label:"Alegría",correct:true},{emoji:"😢",label:"Tristeza",correct:false},{emoji:"😠",label:"Enojo",correct:false}]},
+  { scene:"😭", text:"Se le rompió su dibujo favorito y llora.", options:[
+    {emoji:"😊",label:"Alegría",correct:false},{emoji:"😢",label:"Tristeza",correct:true},{emoji:"😨",label:"Miedo",correct:false}]},
+  { scene:"😤", text:"Alguien le quitó su lápiz sin pedirlo y frunce el ceño.", options:[
+    {emoji:"😠",label:"Enojo",correct:true},{emoji:"😊",label:"Alegría",correct:false},{emoji:"😢",label:"Tristeza",correct:false}]},
+  { scene:"😱", text:"Escuchó un trueno muy fuerte y se abraza a su mochila.", options:[
+    {emoji:"😨",label:"Miedo",correct:true},{emoji:"😠",label:"Enojo",correct:false},{emoji:"😊",label:"Alegría",correct:false}]},
+  { scene:"🥺", text:"Su mejor amiga está triste y él la abraza para acompañarla.", options:[
+    {emoji:"🤗",label:"Ayudar a un triste",correct:true},{emoji:"😆",label:"Reírse de ella",correct:false},{emoji:"🙈",label:"Ignorarla",correct:false}]},
+];
+
+let idx=0, score=0, answered=false;
+function shuffle(a){return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);}
+
+function render(){
+  answered=false;
+  const r = rounds[idx];
+  const opts = shuffle(r.options);
+  document.getElementById('game').innerHTML = `
+    <div class="scene">${r.scene}</div>
+    <div class="scene-text-row">
+      <div class="scene-text">${r.text}</div>
+      <button class="speak-btn" onclick="speak(rounds[idx].text)">🔊</button>
+    </div>
+    <div class="options">
+      ${opts.map(o=>`<div class="opt" data-correct="${o.correct}" onclick="pick(this)"><span class="emoji">${o.emoji}</span>${o.label}</div>`).join('')}
+    </div>
+    <div class="feedback" id="feedback"></div>
+  `;
+  document.getElementById('progress').textContent = `Situación ${idx+1} de ${rounds.length} · ⭐ ${score}`;
+  speak(r.text);
+}
+
+function pick(el){
+  if (answered) return;
+  answered = true;
+  const correct = el.dataset.correct === "true";
+  document.querySelectorAll('.opt').forEach(o=>{ if(o.dataset.correct==="true") o.classList.add('correct'); });
+  if (!correct) { el.classList.add('wrong'); vibrate([30,60,30]); } else { score++; vibrate(40); }
+  document.getElementById('feedback').textContent = correct ? "¡Así es! 🎉" : "Casi — mira la opción verde 💚";
+  setTimeout(()=>{ idx++; if(idx<rounds.length) render(); else finish(); }, 1400);
+}
+
+function finish(){
+  const pct = score/rounds.length;
+  document.getElementById('game').innerHTML = `
+    <div class="stars">${'⭐'.repeat(Math.max(1,Math.round(pct*5)))}</div>
+    <div class="feedback">¡Terminaste! Acertaste ${score} de ${rounds.length}</div>
+    <button class="next-btn" onclick="idx=0;score=0;render();">Jugar de nuevo</button>
+  `;
+  document.getElementById('progress').textContent='';
+  if (pct >= 0.6) confettiBurst();
+}
+</script>
+
+
+</body></html>
