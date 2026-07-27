@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<!-- saved from url=(0058)file:///C:/Users/dylan/Downloads/Mensajeras_de_la_Paz.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mensajeras de la Paz</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Comic Sans MS', 'Trebuchet MS', sans-serif;
+    background: linear-gradient(180deg, #d8b8f0 0%, #9575CD 55%, #4a2f7a 100%);
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    padding: 20px; color: #fff; position: relative;
+  }
+  h1 { text-align: center; font-size: 1.5em; text-shadow: 2px 2px 0 #4a2f7a; margin: 6px 0; }
+  .sub { text-align: center; opacity: 0.95; margin-bottom: 16px; max-width: 480px; }
+  .steps-pool, .steps-answer {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-width: 480px; margin-bottom: 16px;
+  }
+  .step-chip {
+    background: white; color: #4a2f7a; padding: 14px 18px; border-radius: 16px; font-weight: bold;
+    cursor: pointer; box-shadow: 0 5px 0 #d8c8ea; font-size: 0.95em; user-select: none;
+  }
+  .step-chip.used { opacity: 0.3; pointer-events: none; }
+  .slot {
+    min-width: 90px; min-height: 50px; border: 3px dashed rgba(255,255,255,0.6); border-radius: 14px;
+    display: flex; align-items: center; justify-content: center; padding: 8px 12px; font-weight: bold;
+  }
+  .slot.filled { border-style: solid; background: #FFB300; color: #4a2f7a; }
+  .feedback { min-height: 30px; font-size: 1.2em; margin: 10px 0; text-align: center; }
+  .card-row { display: flex; align-items: center; gap: 10px; max-width: 460px; width: 100%; margin-bottom: 14px; }
+  .card {
+    background: white; color: #4a2f7a; border-radius: 20px; padding: 22px; flex: 1;
+    font-size: 1.05em; text-align: center; box-shadow: 0 6px 0 #4a2f7a;
+  }
+  .speak-btn {
+    background: #FFB300; color: #4a2f7a; border: none; border-radius: 50%;
+    width: 50px; height: 50px; font-size: 1.3em; cursor: pointer; box-shadow: 0 5px 0 #b57900; flex-shrink: 0;
+  }
+  .options { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 460px; }
+  .opt-btn {
+    padding: 14px; border-radius: 14px; border: none; background: #f0e8fa; color: #4a2f7a;
+    font-size: 1em; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #d8c8ea;
+  }
+  .hidden { display: none; }
+  .end-screen { text-align: center; max-width: 460px; }
+  .restart {
+    margin-top: 20px; padding: 14px 28px; background: #FFB300; color: #4a2f7a;
+    border: none; border-radius: 30px; font-size: 1.1em; font-weight: bold; cursor: pointer;
+    box-shadow: 0 6px 0 #b57900;
+  }
+  .mute-btn {
+    position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.9); border: none;
+    border-radius: 50%; width: 46px; height: 46px; font-size: 1.3em; cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+  }
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(74,47,122,0.92); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+  }
+  .modal-box { background: white; color: #4a2f7a; border-radius: 24px; padding: 30px; max-width: 420px; text-align: center; }
+  .modal-box button {
+    margin-top: 16px; padding: 16px 32px; background: #9575CD; color: white; border: none;
+    border-radius: 30px; font-size: 1.1em; font-weight: bold; cursor: pointer; box-shadow: 0 6px 0 #6a4ba0;
+  }
+  .miss-list { text-align: left; background: rgba(255,255,255,0.15); border-radius: 14px; padding: 14px 18px; margin-top: 14px; font-size: 0.9em; }
+  .miss-list div { margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
+
+<div class="modal-overlay" id="introModal">
+  <div class="modal-box">
+    <div style="font-size:3em">🦋</div>
+    <h2>Cómo se juega</h2>
+    <p>Primero ordena los 4 pasos para llegar a un acuerdo dialogando. Después, aplica esos pasos a situaciones reales.</p>
+    <button onclick="closeIntro()">¡Empezar! 🎮</button>
+  </div>
+</div>
+
+<h1>🦋 Mensajeras de la Paz</h1>
+
+<div id="phase1" class="hidden">
+  <p class="sub">Mari olvidó el orden de los 4 pasos para llegar a un acuerdo dialogando. Tócalos en orden:</p>
+  <div class="steps-answer" id="answerSlots"><div class="slot">1</div><div class="slot">2</div><div class="slot">3</div><div class="slot">4</div></div>
+  <div class="steps-pool" id="pool"><div class="step-chip">Escuchar lo que piensa el otro</div><div class="step-chip">Explicar cómo me siento</div><div class="step-chip">Ponernos de acuerdo y cumplirlo</div><div class="step-chip">Buscar una solución para los dos</div></div>
+  <div class="feedback" id="fb1"></div>
+</div>
+
+<div id="phase2" class="hidden">
+  <p class="sub">Ahora aplica lo aprendido. Lee la situación y elige qué paso corresponde:</p>
+  <div class="card-row">
+    <div class="card" id="scenarioText"></div>
+    <button class="speak-btn" onclick="speak(scenarios[sIndex].text)">🔊</button>
+  </div>
+  <div class="options" id="scenarioOptions"></div>
+  <div class="feedback" id="fb2"></div>
+</div>
+
+<div class="end-screen hidden" id="endScreen">
+  <div style="font-size:3.5em">🦋🏅</div>
+  <h2>¡Ya eres Mensajera de la Paz!</h2>
+  <p id="scoreText"></p>
+  <div class="miss-list hidden" id="missList"></div>
+  <button class="restart" onclick="location.reload()">Jugar de nuevo</button>
+</div>
+
+<script>
+let muted = false;
+function vibrate(pattern) { if (!muted && navigator.vibrate) { try { navigator.vibrate(pattern); } catch(e){} } }
+function speak(text) {
+  if (muted || !('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'es-MX'; u.rate = 0.95;
+  window.speechSynthesis.speak(u);
+}
+function toggleMute() {
+  muted = !muted;
+  document.getElementById('muteBtn').textContent = muted ? '🔇' : '🔊';
+  if (muted && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+function confettiBurst() {
+  const colors = ['#FFB300','#FF6F61','#4CBB6F','#9575CD','#ffffff'];
+  for (let i=0;i<40;i++){
+    const el = document.createElement('div');
+    const size = 6+Math.random()*8;
+    el.style.cssText = `position:fixed;top:-20px;left:${Math.random()*100}vw;width:${size}px;height:${size}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>0.5?'50%':'2px'};z-index:9999;pointer-events:none;`;
+    document.body.appendChild(el);
+    const duration = 2200+Math.random()*1500;
+    const rotate = (Math.random()>0.5?1:-1)*(Math.random()*360+180);
+    const drift = (Math.random()-0.5)*200;
+    el.animate([
+      { transform: `translate(0,0) rotate(0deg)`, opacity:1 },
+      { transform: `translate(${drift}px, 100vh) rotate(${rotate}deg)`, opacity:0.4 }
+    ], { duration, easing:'ease-in' });
+    setTimeout(()=>el.remove(), duration);
+  }
+}
+function closeIntro() {
+  document.getElementById('introModal').style.display = 'none';
+  document.getElementById('phase1').classList.remove('hidden');
+}
+
+const correctOrder = [
+  "Explicar cómo me siento",
+  "Escuchar lo que piensa el otro",
+  "Buscar una solución para los dos",
+  "Ponernos de acuerdo y cumplirlo"
+];
+
+let pool = [...correctOrder].sort(() => Math.random() - 0.5);
+let placed = [];
+
+const poolDiv = document.getElementById('pool');
+const slotsDiv = document.getElementById('answerSlots');
+
+function renderPool() {
+  poolDiv.innerHTML = '';
+  pool.forEach((step) => {
+    const chip = document.createElement('div');
+    chip.className = 'step-chip';
+    chip.textContent = step;
+    chip.onclick = () => placeStep(step, chip);
+    poolDiv.appendChild(chip);
+  });
+}
+
+function renderSlots() {
+  slotsDiv.innerHTML = '';
+  for (let i = 0; i < 4; i++) {
+    const s = document.createElement('div');
+    s.className = 'slot' + (placed[i] ? ' filled' : '');
+    s.textContent = placed[i] ? (i+1) + '. ' + placed[i] : (i+1);
+    slotsDiv.appendChild(s);
+  }
+}
+
+function placeStep(step, chipEl) {
+  if (placed.length >= 4) return;
+  placed.push(step);
+  chipEl.classList.add('used');
+  renderSlots();
+  if (placed.length === 4) checkOrder();
+}
+
+function checkOrder() {
+  const fb = document.getElementById('fb1');
+  const isCorrect = placed.every((s, i) => s === correctOrder[i]);
+  if (isCorrect) {
+    fb.textContent = '¡Perfecto! Ese es el orden correcto 🎉';
+    fb.style.color = '#FFB300';
+    vibrate(40);
+    setTimeout(startPhase2, 1400);
+  } else {
+    fb.textContent = 'Ese orden no es el correcto, inténtalo de nuevo 🤔';
+    fb.style.color = '#ffdada';
+    vibrate([30,60,30]);
+    setTimeout(() => {
+      placed = [];
+      pool = [...correctOrder].sort(() => Math.random() - 0.5);
+      renderPool();
+      renderSlots();
+      fb.textContent = '';
+    }, 1500);
+  }
+}
+
+renderPool();
+renderSlots();
+
+const scenarios = [
+  { text: "Dos equipos quieren usar la misma cancha al mismo tiempo. ¿Cuál es el PRIMER paso?", options: ["Buscar una solución", "Explicar cómo se siente cada equipo", "Ponerse de acuerdo"], correct: 1 },
+  { text: "Ya cada equipo explicó cómo se siente. ¿Qué sigue?", options: ["Escuchar lo que piensa el otro equipo", "Ir con el maestro a acusar", "Ignorar al otro equipo"], correct: 0 },
+  { text: "Ya se escucharon los dos equipos. ¿Qué deben hacer ahora?", options: ["Volver a discutir", "Buscar una solución que sirva a los dos", "Quedarse callados"], correct: 1 },
+  { text: "Ya tienen una posible solución. ¿Cómo terminan de hacer las paces?", options: ["Cada quien hace lo que quiere", "Ponerse de acuerdo y cumplirlo", "Uno decide por el otro equipo"], correct: 1 },
+];
+let sIndex = 0, score2 = 0, misses = [];
+
+function startPhase2() {
+  document.getElementById('phase1').classList.add('hidden');
+  document.getElementById('phase2').classList.remove('hidden');
+  showScenario();
+}
+
+function showScenario() {
+  if (sIndex >= scenarios.length) return endGame();
+  const s = scenarios[sIndex];
+  document.getElementById('scenarioText').textContent = s.text;
+  const optDiv = document.getElementById('scenarioOptions');
+  optDiv.innerHTML = '';
+  document.getElementById('fb2').textContent = '';
+  speak(s.text);
+  s.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = opt;
+    btn.onclick = () => answerScenario(i);
+    optDiv.appendChild(btn);
+  });
+}
+
+function answerScenario(i) {
+  const s = scenarios[sIndex];
+  const fb = document.getElementById('fb2');
+  if (i === s.correct) {
+    score2++;
+    fb.textContent = '¡Correcto! 🎉';
+    fb.style.color = '#FFB300';
+    vibrate(40);
+  } else {
+    fb.textContent = 'No es ese, pero sigue intentando 🤔';
+    fb.style.color = '#ffdada';
+    vibrate([30,60,30]);
+    misses.push(s.text);
+  }
+  sIndex++;
+  setTimeout(showScenario, 1100);
+}
+
+function endGame() {
+  document.getElementById('phase2').classList.add('hidden');
+  document.getElementById('endScreen').classList.remove('hidden');
+  const pct = score2 / scenarios.length;
+  document.getElementById('scoreText').textContent =
+    'Acertaste ' + score2 + ' de ' + scenarios.length + ' situaciones. ' +
+    (pct === 1 ? '¡Dominas el diálogo para llegar a acuerdos!' : pct >= 0.5 ? '¡Muy bien! Sigue practicando.' : 'Repásalos con tu grupo y vuelve a intentar.');
+  if (misses.length) {
+    const ml = document.getElementById('missList');
+    ml.classList.remove('hidden');
+    ml.innerHTML = '<strong>Para repasar:</strong>' + misses.map(m => `<div>• ${m}</div>`).join('');
+  }
+  if (pct >= 0.75) confettiBurst();
+}
+</script>
+
+
+</body></html>
