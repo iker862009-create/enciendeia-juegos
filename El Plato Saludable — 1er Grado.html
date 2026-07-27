@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<!-- saved from url=(0066)file:///C:/Users/dylan/Downloads/El_Plato_Saludable_1er_Grado.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Plato Saludable — 1er Grado</title>
+<style>
+  :root { --teal:#0096BC; --teal-dark:#006583; --navy:#1B3A5C; --gold:#FFB300; --coral:#FF6F61; --green:#4CBB6F; --purple:#9575CD; --cream:#FFFAEB; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:'Segoe UI',system-ui,sans-serif; background:linear-gradient(180deg,var(--teal) 0%,var(--teal-dark) 100%); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:20px; color:var(--navy); position:relative; }
+  .bunting { display:flex; width:100%; max-width:700px; height:24px; margin-bottom:10px; }
+  .bunting div { flex:1; height:0; border-left:20px solid transparent; border-right:20px solid transparent; border-top:24px solid; }
+  h1 { color:white; font-size:1.7rem; margin:10px 0 4px; text-align:center; }
+  .sub { color:#FFE7B0; margin-bottom:16px; font-weight:600; }
+  .card { background:white; border-radius:24px; padding:24px; max-width:700px; width:100%; box-shadow:0 8px 24px rgba(0,0,0,0.15); text-align:center; }
+  .plate {
+    width:220px; height:220px; border-radius:50%; border:8px dashed var(--teal); margin:0 auto 20px;
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:4px; padding:10px; background:var(--cream);
+    font-size:1.8rem;
+  }
+  .foods { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:10px; }
+  .food { border:3px solid var(--teal); border-radius:14px; padding:10px; font-size:2rem; background:white; cursor:pointer; transition:transform 0.15s; position:relative; }
+  .food:active { transform:scale(0.92); }
+  .food.used { opacity:0.3; pointer-events:none; }
+  .label { font-size:0.7rem; margin-top:2px; color:var(--navy); }
+  .feedback { text-align:center; font-size:1.2rem; font-weight:700; margin-top:16px; min-height:36px; }
+  .next-btn { display:block; margin:16px auto 0; background:var(--gold); color:white; border:none; border-radius:30px; padding:14px 32px; font-size:1.1rem; font-weight:700; cursor:pointer; }
+  .stars { font-size:2.5rem; text-align:center; margin:16px 0; }
+  .progress { color:white; margin-top:14px; font-weight:600; }
+  footer { color:#D6EEF5; margin-top:20px; font-size:0.85rem; text-align:center; }
+  .mute-btn { position:absolute; top:16px; right:16px; background:rgba(255,255,255,0.9); border:none; border-radius:50%; width:46px; height:46px; font-size:1.3em; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,0.2); }
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,60,80,0.9); display:flex; align-items:center; justify-content:center; z-index:1000; padding:20px; }
+  .modal-box { background:white; color:var(--navy); border-radius:24px; padding:28px; max-width:380px; text-align:center; }
+  .modal-box button { margin-top:14px; padding:14px 28px; background:var(--green); color:white; border:none; border-radius:999px; font-size:1.05em; font-weight:700; cursor:pointer; box-shadow:0 5px 0 #327d49; }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+  <button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
+  <div class="modal-overlay" id="introModal">
+    <div class="modal-box">
+      <div style="font-size:2.6em">🐒</div>
+      <h2>Cómo se juega</h2>
+      <p>Toca 4 alimentos saludables para armar tu plato. Si tocas uno que no es saludable, inténtalo con otro.</p>
+      <button onclick="closeIntro()">¡Empezar! 🎮</button>
+    </div>
+  </div>
+  <div class="bunting" id="bunting"><div style="border-top-color: rgb(255, 111, 97);"></div><div style="border-top-color: rgb(255, 179, 0);"></div><div style="border-top-color: rgb(76, 187, 111);"></div><div style="border-top-color: rgb(0, 150, 188);"></div><div style="border-top-color: rgb(149, 117, 205);"></div><div style="border-top-color: rgb(255, 111, 97);"></div><div style="border-top-color: rgb(255, 179, 0);"></div><div style="border-top-color: rgb(76, 187, 111);"></div><div style="border-top-color: rgb(0, 150, 188);"></div><div style="border-top-color: rgb(149, 117, 205);"></div><div style="border-top-color: rgb(255, 111, 97);"></div><div style="border-top-color: rgb(255, 179, 0);"></div><div style="border-top-color: rgb(76, 187, 111);"></div><div style="border-top-color: rgb(0, 150, 188);"></div><div style="border-top-color: rgb(149, 117, 205);"></div></div>
+  <h1>🐒 El Plato Saludable 🦓</h1>
+  <div class="sub">1er Grado · Proyecto 5</div>
+  <div class="card hidden" id="mainCard">
+    <p style="font-weight:600;">Toca 4 alimentos saludables para armar tu plato:</p>
+    <div class="plate" id="plate"></div>
+    <div class="foods" id="foods">
+    <div class="food" id="food0" onclick="pickFood(0)">
+      🍬
+      <div class="label">Dulces</div>
+    </div>
+  
+    <div class="food" id="food1" onclick="pickFood(1)">
+      🍟
+      <div class="label">Papas fritas</div>
+    </div>
+  
+    <div class="food" id="food2" onclick="pickFood(2)">
+      🥕
+      <div class="label">Zanahoria</div>
+    </div>
+  
+    <div class="food" id="food3" onclick="pickFood(3)">
+      🥤
+      <div class="label">Refresco</div>
+    </div>
+  
+    <div class="food" id="food4" onclick="pickFood(4)">
+      🍞
+      <div class="label">Pan</div>
+    </div>
+  
+    <div class="food" id="food5" onclick="pickFood(5)">
+      🍎
+      <div class="label">Manzana</div>
+    </div>
+  
+    <div class="food" id="food6" onclick="pickFood(6)">
+      🍰
+      <div class="label">Pastel</div>
+    </div>
+  
+    <div class="food" id="food7" onclick="pickFood(7)">
+      🍌
+      <div class="label">Plátano</div>
+    </div>
+  
+    <div class="food" id="food8" onclick="pickFood(8)">
+      🥦
+      <div class="label">Brócoli</div>
+    </div>
+  
+    <div class="food" id="food9" onclick="pickFood(9)">
+      🍗
+      <div class="label">Pollo</div>
+    </div>
+  </div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+  <div class="progress" id="progress"></div>
+  <footer>EnciendeIA · Planeaciones NEM</footer>
+
+<script>
+const colors = ['#FF6F61','#FFB300','#4CBB6F','#0096BC','#9575CD'];
+const b = document.getElementById('bunting');
+for (let i=0;i<15;i++){ const d=document.createElement('div'); d.style.borderTopColor=colors[i%5]; b.appendChild(d); }
+
+let muted = false;
+function vibrate(pattern){ if(!muted && navigator.vibrate){ try{ navigator.vibrate(pattern); }catch(e){} } }
+function toggleMute(){ muted=!muted; document.getElementById('muteBtn').textContent = muted?'🔇':'🔊'; }
+function confettiBurst(){
+  const cs=['#FFB300','#FF6F61','#4CBB6F','#9575CD','#ffffff'];
+  for(let i=0;i<40;i++){
+    const el=document.createElement('div');
+    const size=6+Math.random()*8;
+    el.style.cssText=`position:fixed;top:-20px;left:${Math.random()*100}vw;width:${size}px;height:${size}px;background:${cs[Math.floor(Math.random()*cs.length)]};border-radius:${Math.random()>0.5?'50%':'2px'};z-index:9999;pointer-events:none;`;
+    document.body.appendChild(el);
+    const duration=2200+Math.random()*1500;
+    const rotate=(Math.random()>0.5?1:-1)*(Math.random()*360+180);
+    const drift=(Math.random()-0.5)*200;
+    el.animate([{transform:'translate(0,0) rotate(0deg)',opacity:1},{transform:`translate(${drift}px, 100vh) rotate(${rotate}deg)`,opacity:0.4}],{duration,easing:'ease-in'});
+    setTimeout(()=>el.remove(), duration);
+  }
+}
+function closeIntro(){
+  document.getElementById('introModal').style.display='none';
+  document.getElementById('mainCard').classList.remove('hidden');
+  document.getElementById('progress').textContent = 'Elegidos: 0 de 4';
+}
+
+const allFoods = [
+  {emoji:"🍎",label:"Manzana",healthy:true},
+  {emoji:"🥦",label:"Brócoli",healthy:true},
+  {emoji:"🍞",label:"Pan",healthy:true},
+  {emoji:"🍗",label:"Pollo",healthy:true},
+  {emoji:"🥕",label:"Zanahoria",healthy:true},
+  {emoji:"🍌",label:"Plátano",healthy:true},
+  {emoji:"🍰",label:"Pastel",healthy:false},
+  {emoji:"🥤",label:"Refresco",healthy:false},
+  {emoji:"🍬",label:"Dulces",healthy:false},
+  {emoji:"🍟",label:"Papas fritas",healthy:false},
+];
+
+let chosen = 0;
+let wrongClicks = 0;
+const foodsShuffled = allFoods.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]);
+
+function renderFoods() {
+  document.getElementById('foods').innerHTML = foodsShuffled.map((f,i) => `
+    <div class="food" id="food${i}" onclick="pickFood(${i})">
+      ${f.emoji}
+      <div class="label">${f.label}</div>
+    </div>
+  `).join('');
+}
+
+function pickFood(i) {
+  const f = foodsShuffled[i];
+  const el = document.getElementById('food'+i);
+  if (el.classList.contains('used')) return;
+  if (f.healthy) {
+    el.classList.add('used');
+    document.getElementById('plate').innerHTML += f.emoji;
+    chosen++;
+    vibrate(40);
+    document.getElementById('progress').textContent = `Elegidos: ${chosen} de 4`;
+    document.getElementById('feedback').textContent = "¡Buena elección! 🎉";
+    if (chosen === 4) finish();
+  } else {
+    vibrate([30,60,30]);
+    document.getElementById('feedback').textContent = "Ese lo comemos solo a veces 🙂 ¡intenta con otro!";
+    wrongClicks++;
+  }
+}
+
+function finish() {
+  setTimeout(() => {
+    document.querySelector('#mainCard').innerHTML = `
+      <div class="stars">⭐⭐⭐⭐⭐</div>
+      <div class="feedback">¡Armaste tu plato saludable! 🥗</div>
+      <button class="next-btn" onclick="location.reload()">Jugar de nuevo</button>
+    `;
+    document.getElementById('progress').textContent = '';
+    confettiBurst();
+  }, 800);
+}
+
+renderFoods();
+</script>
+
+
+</body></html>
