@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<!-- saved from url=(0065)file:///C:/Users/dylan/Downloads/El_Escenario_del_Arrecife_1.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Escenario del Arrecife</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Comic Sans MS', 'Trebuchet MS', sans-serif;
+    background: linear-gradient(180deg, #8fe3f0 0%, #2a9fc0 55%, #0d5c73 100%);
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    padding: 20px; color: #fff; position: relative;
+  }
+  h1 { text-align: center; font-size: 1.5em; text-shadow: 2px 2px 0 #0d5c73; margin: 6px 0; }
+  .sub { text-align: center; opacity: 0.95; margin-bottom: 14px; max-width: 460px; }
+  .progress { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; justify-content: center; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.3); }
+  .dot.done { background: #FFB300; }
+  .dot.wrong { background: #FF6F61; }
+  .card-row { display: flex; align-items: center; gap: 10px; max-width: 460px; width: 100%; margin-bottom: 14px; }
+  .card { background: white; color: #0d5c73; border-radius: 20px; padding: 22px; flex: 1; font-size: 1.05em; text-align: center; box-shadow: 0 6px 0 #0a4a5c; font-weight: bold; }
+  .speak-btn { background: #FFB300; color: #0d5c73; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 1.3em; cursor: pointer; box-shadow: 0 5px 0 #b57900; flex-shrink: 0; }
+  .options { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 460px; }
+  .opt-btn { padding: 14px; border-radius: 14px; border: none; background: #e8f7fb; color: #0d5c73; font-size: 1em; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #b8dfe8; }
+  .feedback { min-height: 30px; font-size: 1.2em; margin: 12px 0; text-align: center; }
+  .end-screen { display: none; text-align: center; max-width: 460px; }
+  .restart { margin-top: 20px; padding: 14px 28px; background: #FFB300; color: #0d5c73; border: none; border-radius: 30px; font-size: 1.1em; font-weight: bold; cursor: pointer; box-shadow: 0 6px 0 #b57900; }
+  .mute-btn { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 46px; height: 46px; font-size: 1.3em; cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(10,74,92,0.92); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+  .modal-box { background: white; color: #0d5c73; border-radius: 24px; padding: 30px; max-width: 420px; text-align: center; }
+  .modal-box button { margin-top: 16px; padding: 16px 32px; background: #4CBB6F; color: white; border: none; border-radius: 30px; font-size: 1.1em; font-weight: bold; cursor: pointer; box-shadow: 0 6px 0 #327d49; }
+  .miss-list { text-align: left; background: rgba(255,255,255,0.15); border-radius: 14px; padding: 14px 18px; margin-top: 14px; font-size: 0.9em; }
+  .miss-list div { margin-bottom: 8px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
+<div class="modal-overlay" id="introModal">
+  <div class="modal-box">
+    <div style="font-size:3em">🐠</div>
+    <h2>Cómo se juega</h2>
+    <p>Nemi te va a leer preguntas de repaso de todo el trimestre. Elige la respuesta correcta.</p>
+    <button onclick="closeIntro()">¡Empezar! 🎮</button>
+  </div>
+</div>
+<h1>🐠 El Escenario del Arrecife</h1>
+<p class="sub">Nemi quiere repasar todo lo que aprendieron este trimestre antes de la función final.</p>
+<div class="progress" id="progress"></div>
+
+<div id="game" class="hidden">
+  <div class="card-row">
+    <div class="card" id="qText"></div>
+    <button class="speak-btn" onclick="speak(order[current].q)">🔊</button>
+  </div>
+  <div class="options" id="options"></div>
+  <div class="feedback" id="feedback"></div>
+</div>
+
+<div class="end-screen" id="endScreen">
+  <div style="font-size:3.5em">🐠🎭</div>
+  <h2>¡Listos para la función y el examen del trimestre!</h2>
+  <p id="scoreText"></p>
+  <div class="miss-list hidden" id="missList"></div>
+  <button class="restart" onclick="restart()">Jugar de nuevo</button>
+</div>
+
+<script>
+const questions = [
+  { q: "¿Por qué es mejor construir un acuerdo entre todos que recibir una regla impuesta?", opts: ["Porque lo entendemos y respetamos mejor", "Porque es más rápido", "Porque nadie tiene que participar"], correct: 0 },
+  { q: "¿Cuál es el primer paso para hacer las paces cuando hay un conflicto?", opts: ["Ignorar al otro", "Contar cómo me siento", "Buscar quién tiene la culpa"], correct: 1 },
+  { q: "¿Qué necesita casi todo ser vivo para estar bien?", opts: ["Agua, alimento y cuidado", "Solo estar solo", "Nada, se cuidan solos"], correct: 0 },
+  { q: "¿A quién le preguntamos sobre saberes y costumbres de antes?", opts: ["A un familiar mayor", "A un desconocido", "A nadie, se inventa"], correct: 0 },
+  { q: "¿Cuál de estas acciones ayuda a cuidar la naturaleza?", opts: ["Dejar la llave abierta", "Reciclar y cerrar la llave", "Tirar basura en el patio"], correct: 1 },
+  { q: "Nosotros somos parte de la naturaleza, no solo espectadores. ¿Verdadero o falso?", opts: ["Verdadero", "Falso", "Depende del día"], correct: 0 },
+  { q: "¿Cómo mostramos todo lo que aprendimos este trimestre?", opts: ["Con un examen escrito larguísimo", "Con una obra de teatro guiñol", "No lo mostramos"], correct: 1 },
+  { q: "Cuando dos personas no están de acuerdo, ¿qué es mejor que gritar?", opts: ["Dialogar y escuchar", "Pelear", "Quedarse callado para siempre"], correct: 0 },
+];
+
+let order = [], current = 0, score = 0, muted = false, misses = [];
+
+function vibrate(pattern) { if (!muted && navigator.vibrate) { try { navigator.vibrate(pattern); } catch(e){} } }
+function speak(text) {
+  if (muted || !('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'es-MX'; u.rate = 0.95;
+  window.speechSynthesis.speak(u);
+}
+function toggleMute() {
+  muted = !muted;
+  document.getElementById('muteBtn').textContent = muted ? '🔇' : '🔊';
+  if (muted && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+function confettiBurst() {
+  const colors = ['#FFB300','#FF6F61','#4CBB6F','#9575CD','#ffffff'];
+  for (let i=0;i<40;i++){
+    const el = document.createElement('div');
+    const size = 6+Math.random()*8;
+    el.style.cssText = `position:fixed;top:-20px;left:${Math.random()*100}vw;width:${size}px;height:${size}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>0.5?'50%':'2px'};z-index:9999;pointer-events:none;`;
+    document.body.appendChild(el);
+    const duration = 2200+Math.random()*1500;
+    const rotate = (Math.random()>0.5?1:-1)*(Math.random()*360+180);
+    const drift = (Math.random()-0.5)*200;
+    el.animate([
+      { transform: `translate(0,0) rotate(0deg)`, opacity:1 },
+      { transform: `translate(${drift}px, 100vh) rotate(${rotate}deg)`, opacity:0.4 }
+    ], { duration, easing:'ease-in' });
+    setTimeout(()=>el.remove(), duration);
+  }
+}
+function closeIntro() {
+  document.getElementById('introModal').style.display = 'none';
+  document.getElementById('game').classList.remove('hidden');
+  restart();
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildProgress() {
+  const p = document.getElementById('progress');
+  p.innerHTML = '';
+  questions.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot'; d.id = 'dot' + i;
+    p.appendChild(d);
+  });
+}
+
+function showQuestion() {
+  if (current >= order.length) return endGame();
+  const q = order[current];
+  document.getElementById('qText').textContent = q.q;
+  const optDiv = document.getElementById('options');
+  optDiv.innerHTML = '';
+  document.getElementById('feedback').textContent = '';
+  speak(q.q);
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = opt;
+    btn.onclick = () => answer(i);
+    optDiv.appendChild(btn);
+  });
+}
+
+function answer(i) {
+  const q = order[current];
+  const fb = document.getElementById('feedback');
+  if (i === q.correct) {
+    score++;
+    fb.textContent = '¡Correcto! 🎉';
+    fb.style.color = '#FFB300';
+    vibrate(40);
+    document.getElementById('dot' + current).classList.add('done');
+  } else {
+    fb.textContent = 'Casi — repásalo con tu grupo 🤔';
+    fb.style.color = '#ffdada';
+    vibrate([30,60,30]);
+    document.getElementById('dot' + current).classList.add('wrong');
+    misses.push(q.q);
+  }
+  current++;
+  setTimeout(showQuestion, 1100);
+}
+
+function endGame() {
+  document.getElementById('game').style.display = 'none';
+  document.getElementById('endScreen').style.display = 'block';
+  const pct = score / order.length;
+  document.getElementById('scoreText').textContent =
+    'Acertaste ' + score + ' de ' + order.length + '. ' +
+    (pct >= 0.8 ? '¡Están listos para el examen oral del trimestre!' : 'Repasen juntos los proyectos antes del examen oral.');
+  if (misses.length) {
+    const ml = document.getElementById('missList');
+    ml.classList.remove('hidden');
+    ml.innerHTML = '<strong>Para repasar:</strong>' + misses.map(m => `<div>• ${m}</div>`).join('');
+  }
+  if (pct >= 0.75) confettiBurst();
+}
+
+function restart() {
+  current = 0; score = 0; misses = [];
+  order = shuffle(questions);
+  buildProgress();
+  document.getElementById('game').style.display = 'block';
+  document.getElementById('endScreen').style.display = 'none';
+  document.getElementById('missList').classList.add('hidden');
+  showQuestion();
+}
+</script>
+
+
+</body></html>
