@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<!-- saved from url=(0059)file:///C:/Users/dylan/Downloads/juego_p5_periodismo_1.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Periodimóvil de Ian · EnciendeIA</title>
+<style>
+  :root{ --color:#0F6E6E; --coloroscuro:#093f3f; }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(160deg,var(--color),var(--coloroscuro));min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .card{background:#fff;border-radius:24px;max-width:560px;width:100%;padding:28px;box-shadow:0 20px 50px rgba(0,0,0,.3);position:relative;}
+  h1{font-size:22px;color:var(--coloroscuro);margin:0 0 6px;}
+  .sub{color:#666;font-size:14px;margin-bottom:18px;}
+  #mute{position:absolute;top:20px;right:20px;background:none;border:none;font-size:22px;cursor:pointer;}
+  .screen{display:none;}
+  .screen.active{display:block;}
+  .btn{display:block;width:100%;text-align:left;background:#f3f3f3;border:2px solid #e0e0e0;border-radius:14px;padding:14px 16px;margin:10px 0;font-size:16px;cursor:pointer;transition:.15s;}
+  .btn:hover{border-color:var(--color);}
+  .btn.correct{background:#dff5e1;border-color:#4a8b5c;}
+  .btn.wrong{background:#fbe3e0;border-color:#e4674b;}
+  .progress{height:8px;background:#eee;border-radius:4px;overflow:hidden;margin-bottom:16px;}
+  .progress-bar{height:100%;background:var(--color);width:0%;transition:.3s;}
+  .startbtn{background:var(--color);color:#fff;border:none;border-radius:14px;padding:14px 20px;font-size:17px;cursor:pointer;width:100%;margin-top:10px;}
+  .missitem{background:#fbe3e0;border-radius:10px;padding:10px 14px;margin:8px 0;font-size:14px;}
+  #confetti-canvas{position:fixed;top:0;left:0;pointer-events:none;z-index:99;}
+  .emoji{font-size:40px;text-align:center;margin-bottom:8px;}
+</style>
+</head>
+<body>
+<canvas id="confetti-canvas" width="1912" height="948"></canvas>
+<div class="card">
+  <button id="mute" title="Silenciar voz">🔊</button>
+
+  <div class="screen active" id="screen-intro">
+    <div class="emoji">📰</div>
+    <h1>El Periodimóvil de Ian</h1>
+    <div class="sub">Ian te reta a demostrar lo que aprendiste. Responde las 4 preguntas.</div>
+    <button class="startbtn" onclick="startGame()">Comenzar</button>
+  </div>
+
+  <div class="screen" id="screen-game">
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+    <h1 id="qtext"></h1>
+    <div id="answers"></div>
+  </div>
+
+  <div class="screen" id="screen-end">
+    <div class="emoji">🏆</div>
+    <h1 id="scoretext"></h1>
+    <div id="misslist"></div>
+    <button class="startbtn" onclick="location.reload()">Jugar de nuevo</button>
+  </div>
+</div>
+
+<script>
+const PREGUNTAS = [{"q": "¿Qué es el 'balazo' en una nota informativa?", "opciones": ["Un elemento gráfico que resume el tema antes del título", "El final de la noticia", "Un tipo de fotografía"], "correcta": 0}, {"q": "¿Cuál es la diferencia entre un hecho informativo y una opinión?", "opciones": ["No hay diferencia", "El hecho se puede verificar, la opinión es un punto de vista personal", "La opinión siempre es falsa"], "correcta": 1}, {"q": "Antes de redactar una nota, ¿qué debe hacer un reportero?", "opciones": ["Inventar la información", "Investigar y verificar los datos", "Copiar otra noticia"], "correcta": 1}, {"q": "El Periodimóvil escolar sirve para...", "opciones": ["Compartir información relevante con la comunidad escolar", "Solo entretenimiento sin información real", "Vender anuncios"], "correcta": 0}];
+let idx = 0, score = 0, muted = false, misses = [];
+let selectedVoice = null;
+
+function pickBestVoice(){
+  if (!('speechSynthesis' in window)) return;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return;
+  // Prioridad: voces de red de mejor calidad conocidas > cualquier voz es-MX > cualquier voz es-*
+  const priorityNames = ['Google español', 'Google Spanish', 'Paulina', 'Mónica', 'Microsoft Dalia', 'Microsoft Sabina', 'Microsoft Renata'];
+  for (const name of priorityNames) {
+    const v = voices.find(v => v.name.includes(name));
+    if (v) { selectedVoice = v; return; }
+  }
+  selectedVoice = voices.find(v => v.lang === 'es-MX')
+    || voices.find(v => v.lang && v.lang.startsWith('es') && /google|natural|enhanced|premium/i.test(v.name))
+    || voices.find(v => v.lang && v.lang.startsWith('es'))
+    || null;
+}
+if ('speechSynthesis' in window) {
+  pickBestVoice();
+  window.speechSynthesis.onvoiceschanged = pickBestVoice;
+}
+
+function speak(text){
+  if(muted || !('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'es-MX'; u.rate = 0.95; u.pitch = 1.0;
+  if (selectedVoice) u.voice = selectedVoice;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+document.getElementById('mute').onclick = function(){
+  muted = !muted;
+  this.textContent = muted ? '🔇' : '🔊';
+  if(muted) window.speechSynthesis.cancel();
+};
+
+function startGame(){
+  document.getElementById('screen-intro').classList.remove('active');
+  document.getElementById('screen-game').classList.add('active');
+  showQuestion();
+}
+
+function showQuestion(){
+  const q = PREGUNTAS[idx];
+  document.getElementById('progressBar').style.width = (idx/PREGUNTAS.length*100)+'%';
+  document.getElementById('qtext').textContent = q.q;
+  const box = document.getElementById('answers');
+  box.innerHTML = '';
+  speak(q.q);
+  q.opciones.forEach((op, i) => {
+    const b = document.createElement('button');
+    b.className = 'btn';
+    b.textContent = op;
+    b.onclick = () => answer(i, b);
+    box.appendChild(b);
+  });
+}
+
+function answer(i, btn){
+  const q = PREGUNTAS[idx];
+  const buttons = document.querySelectorAll('#answers .btn');
+  buttons.forEach(b => b.onclick = null);
+  if(i === q.correcta){
+    btn.classList.add('correct');
+    score++;
+    if(navigator.vibrate) navigator.vibrate(60);
+    speak('¡Correcto!');
+    launchConfetti();
+  } else {
+    btn.classList.add('wrong');
+    buttons[q.correcta].classList.add('correct');
+    if(navigator.vibrate) navigator.vibrate([40,40,40]);
+    speak('Casi. La respuesta correcta era: ' + q.opciones[q.correcta]);
+    misses.push(q.q + ' — Respuesta correcta: ' + q.opciones[q.correcta]);
+  }
+  setTimeout(() => {
+    idx++;
+    if(idx < PREGUNTAS.length) showQuestion(); else endGame();
+  }, 1400);
+}
+
+function endGame(){
+  document.getElementById('screen-game').classList.remove('active');
+  document.getElementById('screen-end').classList.add('active');
+  document.getElementById('progressBar').style.width = '100%';
+  document.getElementById('scoretext').textContent = 'Obtuviste ' + score + ' de ' + PREGUNTAS.length;
+  speak('Terminaste con ' + score + ' de ' + PREGUNTAS.length + ' respuestas correctas.');
+  const ml = document.getElementById('misslist');
+  if(misses.length === 0){
+    ml.innerHTML = '<div class="missitem" style="background:#dff5e1;">¡Respondiste todo correctamente!</div>';
+    launchConfetti(true);
+  } else {
+    ml.innerHTML = '<div class="sub">Repasa esto:</div>' + misses.map(m => '<div class="missitem">'+m+'</div>').join('');
+  }
+}
+
+// Confeti simple en canvas
+const canvas = document.getElementById('confetti-canvas');
+const ctx = canvas.getContext('2d');
+function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resize(); window.addEventListener('resize', resize);
+let particles = [];
+function launchConfetti(big){
+  const n = big ? 120 : 40;
+  for(let i=0;i<n;i++){
+    particles.push({
+      x: Math.random()*canvas.width, y: -10,
+      vx: (Math.random()-0.5)*4, vy: Math.random()*3+2,
+      color: ['#0F6E6E','#C9A24B','#4A8B5C','#E4674B'][Math.floor(Math.random()*4)],
+      size: Math.random()*6+4, rot: Math.random()*360
+    });
+  }
+}
+function tick(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy; p.rot += 5;
+    ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+    ctx.fillStyle = p.color; ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
+    ctx.restore();
+  });
+  particles = particles.filter(p => p.y < canvas.height + 20);
+  requestAnimationFrame(tick);
+}
+tick();
+</script>
+
+
+</body></html>
