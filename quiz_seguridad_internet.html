@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detective Digital — Seguridad en Internet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1C3A52;
+    --teal:#0E6B85;
+    --teal-light:#EAF6F8;
+    --gold:#C98A1F;
+    --gold-light:#FBF0DC;
+    --good:#2F9E44;
+    --good-light:#E7F6EA;
+    --bad:#E15554;
+    --bad-light:#FDEAEA;
+    --cream:#FFFCF6;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:linear-gradient(180deg,#0E6B85 0%,#134F63 100%);
+    font-family:'Nunito',sans-serif;
+    color:var(--navy);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px 16px;
+  }
+  .app{
+    width:100%;
+    max-width:480px;
+  }
+  .header{
+    text-align:center;
+    color:#fff;
+    margin-bottom:18px;
+  }
+  .eyebrow{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--gold-light);
+    opacity:.9;
+  }
+  .title{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:800;
+    font-size:28px;
+    margin:4px 0 0;
+    line-height:1.15;
+  }
+  .path{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin:18px 0 20px;
+  }
+  .star{
+    width:26px;height:26px;
+    border-radius:50%;
+    background:rgba(255,255,255,.25);
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;
+    transition:transform .35s ease, background .35s ease;
+  }
+  .star.on{
+    background:var(--gold);
+    transform:scale(1.15);
+  }
+  .card{
+    background:var(--cream);
+    border-radius:24px;
+    padding:28px 24px 24px;
+    box-shadow:0 18px 40px rgba(0,0,0,.25);
+    min-height:360px;
+    display:flex;
+    flex-direction:column;
+  }
+  .qnum{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    font-size:13px;
+    color:var(--teal);
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    margin-bottom:10px;
+  }
+  .scenario{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    font-size:20px;
+    line-height:1.35;
+    color:var(--navy);
+    margin-bottom:22px;
+  }
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:auto;
+  }
+  .opt{
+    font-family:'Nunito',sans-serif;
+    font-weight:800;
+    font-size:17px;
+    padding:16px 18px;
+    border-radius:16px;
+    border:2px solid var(--teal);
+    background:#fff;
+    color:var(--teal);
+    cursor:pointer;
+    text-align:left;
+    transition:transform .12s ease, background .2s ease, color .2s ease;
+  }
+  .opt:hover{transform:translateY(-2px);}
+  .opt:active{transform:translateY(0);}
+  .opt.correct{
+    background:var(--good);
+    border-color:var(--good);
+    color:#fff;
+  }
+  .opt.incorrect{
+    background:var(--bad);
+    border-color:var(--bad);
+    color:#fff;
+  }
+  .opt[disabled]{cursor:default;}
+  .feedback{
+    margin-top:16px;
+    padding:14px 16px;
+    border-radius:14px;
+    font-weight:700;
+    font-size:15px;
+    line-height:1.4;
+    display:none;
+  }
+  .feedback.show{display:block;}
+  .feedback.good{background:var(--good-light);color:#1c6b2c;}
+  .feedback.bad{background:var(--bad-light);color:#a02322;}
+  .next{
+    margin-top:16px;
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    font-size:16px;
+    background:var(--gold);
+    color:#fff;
+    border:none;
+    border-radius:14px;
+    padding:14px;
+    cursor:pointer;
+    display:none;
+  }
+  .next.show{display:block;}
+  .result{
+    text-align:center;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    flex:1;
+  }
+  .result.show{display:flex;}
+  .result-emoji{font-size:52px;margin-bottom:6px;}
+  .result-title{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:800;
+    font-size:24px;
+    color:var(--navy);
+    margin:4px 0;
+  }
+  .result-sub{
+    font-size:16px;
+    color:#555;
+    margin-bottom:22px;
+    line-height:1.4;
+  }
+  .restart{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    font-size:15px;
+    background:var(--teal);
+    color:#fff;
+    border:none;
+    border-radius:14px;
+    padding:13px 22px;
+    cursor:pointer;
+  }
+  .quiz-body{display:flex;flex-direction:column;flex:1;}
+  .footer-note{
+    text-align:center;
+    color:rgba(255,255,255,.75);
+    font-size:12px;
+    margin-top:16px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="eyebrow">EnciendeIA · Protocolos de Protección Escolar</div>
+    <div class="title">Detective Digital 🔎</div>
+  </div>
+  <div class="path" id="path"></div>
+  <div class="card">
+    <div class="quiz-body" id="quizBody">
+      <div class="qnum" id="qnum">Pregunta 1 de 6</div>
+      <div class="scenario" id="scenario"></div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="next" id="nextBtn">Siguiente →</button>
+    </div>
+    <div class="result" id="result">
+      <div class="result-emoji" id="resultEmoji">🌟</div>
+      <div class="result-title" id="resultTitle"></div>
+      <div class="result-sub" id="resultSub"></div>
+      <button class="restart" id="restartBtn">Jugar de nuevo</button>
+    </div>
+  </div>
+  <div class="footer-note">Kit de Protocolos de Protección Escolar — EnciendeIA</div>
+</div>
+
+<script>
+const questions = [
+  {
+    text: "En un videojuego en línea, alguien que no conoces te pide tu dirección para \"mandarte un regalo\".",
+    options: [
+      { label: "Se la doy", correct: false },
+      { label: "No se la doy y se lo cuento a un adulto", correct: true },
+    ],
+    feedbackGood: "¡Exacto! Nunca compartimos datos personales con alguien que no conocemos en persona.",
+    feedbackBad: "No es correcto. Nunca compartimos datos personales con alguien que no conocemos en persona — mejor cuéntaselo a un adulto.",
+  },
+  {
+    text: "Un compañero de tu salón te comparte un meme gracioso por chat.",
+    options: [
+      { label: "Está bien platicar con él, ya lo conozco", correct: true },
+      { label: "No debo platicar con nadie por chat", correct: false },
+    ],
+    feedbackGood: "¡Así es! Las reglas son para desconocidos — con tus amigos y compañeros de siempre puedes platicar con confianza.",
+    feedbackBad: "En realidad sí está bien — las reglas son para desconocidos, no para tus amigos de siempre.",
+  },
+  {
+    text: "Alguien que solo conoces por internet te ofrece dinero si le mandas una foto tuya.",
+    options: [
+      { label: "Se la mando si me ofrece suficiente", correct: false },
+      { label: "No se la mando y se lo cuento a un adulto", correct: true },
+    ],
+    feedbackGood: "¡Correcto! Nadie que te ofrece algo a cambio de una foto tiene buenas intenciones — cuéntaselo a un adulto siempre.",
+    feedbackBad: "No es correcto. Nadie que te ofrece algo a cambio de una foto tiene buenas intenciones — cuéntaselo a un adulto siempre.",
+  },
+  {
+    text: "Tu mejor amigo de la escuela te pide tu contraseña \"para no perder su partida\".",
+    options: [
+      { label: "Se la comparto, es mi amigo", correct: false },
+      { label: "No comparto mi contraseña con nadie", correct: true },
+    ],
+    feedbackGood: "¡Exacto! La contraseña no se comparte ni con amigos — es solo tuya.",
+    feedbackBad: "No es correcto. La contraseña no se comparte con nadie, ni siquiera con amigos.",
+  },
+  {
+    text: "Alguien en línea te pide que no le cuentes a nadie de qué están hablando.",
+    options: [
+      { label: "Guardo el secreto, me lo pidió", correct: false },
+      { label: "Es una señal de alerta, se lo cuento a un adulto", correct: true },
+    ],
+    feedbackGood: "¡Muy bien! Cuando alguien te pide guardar un secreto en línea, esa es justo la señal de contarlo.",
+    feedbackBad: "No es lo más seguro. Cuando alguien te pide guardar un secreto en línea, esa es justo la señal de contarlo a un adulto.",
+  },
+  {
+    text: "Recibes una solicitud de amistad de alguien que no conoces en persona.",
+    options: [
+      { label: "La acepto, se ve simpático en su foto", correct: false },
+      { label: "No la acepto y se lo cuento a un adulto", correct: true },
+    ],
+    feedbackGood: "¡Así es! No aceptamos solicitudes de personas que no conocemos en persona.",
+    feedbackBad: "No es correcto. No aceptamos solicitudes de personas que no conocemos en persona — cuéntaselo a un adulto.",
+  },
+];
+
+let current = 0;
+let correctCount = 0;
+
+const pathEl = document.getElementById('path');
+const qnumEl = document.getElementById('qnum');
+const scenarioEl = document.getElementById('scenario');
+const optionsEl = document.getElementById('options');
+const feedbackEl = document.getElementById('feedback');
+const nextBtn = document.getElementById('nextBtn');
+const quizBody = document.getElementById('quizBody');
+const resultEl = document.getElementById('result');
+const resultTitle = document.getElementById('resultTitle');
+const resultSub = document.getElementById('resultSub');
+const resultEmoji = document.getElementById('resultEmoji');
+const restartBtn = document.getElementById('restartBtn');
+
+function buildPath(){
+  pathEl.innerHTML = '';
+  for(let i=0;i<questions.length;i++){
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.textContent = '★';
+    s.id = 'star-'+i;
+    pathEl.appendChild(s);
+  }
+}
+
+function renderQuestion(){
+  const q = questions[current];
+  qnumEl.textContent = `Pregunta ${current+1} de ${questions.length}`;
+  scenarioEl.textContent = q.text;
+  optionsEl.innerHTML = '';
+  feedbackEl.className = 'feedback';
+  feedbackEl.textContent = '';
+  nextBtn.className = 'next';
+
+  q.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.textContent = opt.label;
+    btn.addEventListener('click', () => selectOption(idx));
+    optionsEl.appendChild(btn);
+  });
+}
+
+function selectOption(idx){
+  const q = questions[current];
+  const buttons = optionsEl.querySelectorAll('.opt');
+  buttons.forEach(b => b.disabled = true);
+
+  const chosen = q.options[idx];
+  buttons[idx].classList.add(chosen.correct ? 'correct' : 'incorrect');
+
+  if(!chosen.correct){
+    q.options.forEach((opt, i) => { if(opt.correct) buttons[i].classList.add('correct'); });
+  } else {
+    correctCount++;
+    document.getElementById('star-'+current).classList.add('on');
+  }
+
+  feedbackEl.textContent = chosen.correct ? q.feedbackGood : q.feedbackBad;
+  feedbackEl.classList.add('show', chosen.correct ? 'good' : 'bad');
+  nextBtn.classList.add('show');
+}
+
+nextBtn.addEventListener('click', () => {
+  current++;
+  if(current < questions.length){
+    renderQuestion();
+  } else {
+    showResult();
+  }
+});
+
+function showResult(){
+  quizBody.style.display = 'none';
+  resultEl.classList.add('show');
+  const total = questions.length;
+  if(correctCount === total){
+    resultEmoji.textContent = '🛡️';
+    resultTitle.textContent = '¡Excelente, Detective!';
+    resultSub.textContent = `Respondiste bien las ${total} preguntas. Ya sabes cómo cuidarte en internet.`;
+  } else if(correctCount >= total - 2){
+    resultEmoji.textContent = '👏';
+    resultTitle.textContent = '¡Muy bien!';
+    resultSub.textContent = `Respondiste bien ${correctCount} de ${total}. Repasa el cartel de Reglas de Seguridad en Internet para reforzar lo que falta.`;
+  } else {
+    resultEmoji.textContent = '💪';
+    resultTitle.textContent = '¡Sigamos practicando!';
+    resultSub.textContent = `Respondiste bien ${correctCount} de ${total}. Pídele a tu maestro o maestra que revisen juntos el cartel de Reglas de Seguridad en Internet.`;
+  }
+}
+
+restartBtn.addEventListener('click', () => {
+  current = 0;
+  correctCount = 0;
+  quizBody.style.display = 'flex';
+  resultEl.classList.remove('show');
+  buildPath();
+  renderQuestion();
+});
+
+buildPath();
+renderQuestion();
+</script>
+</body>
+</html>
