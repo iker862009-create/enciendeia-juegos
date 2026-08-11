@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memorama — Efemérides de Septiembre | EnciendeIA</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@600;800&display=swap');
+
+  :root{
+    --navy:#1C3A52;
+    --teal:#0E6B85;
+    --gold:#C98A1F;
+    --cream:#FDF6EC;
+    --green:#3F9B5C;
+    --card-back-1:#0E6B85;
+    --card-back-2:#1C3A52;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 10% 10%, #ffe9c7 0%, transparent 35%),
+      radial-gradient(circle at 90% 85%, #d6ecef 0%, transparent 40%),
+      var(--cream);
+    font-family:'Nunito', sans-serif;
+    color:var(--navy);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:24px 16px 60px;
+  }
+  header{
+    text-align:center;
+    margin-bottom:8px;
+  }
+  .brand{
+    font-family:'Fredoka', sans-serif;
+    font-weight:700;
+    font-size:1.1rem;
+    color:var(--gold);
+    letter-spacing:0.5px;
+  }
+  h1{
+    font-family:'Fredoka', sans-serif;
+    font-weight:700;
+    font-size:clamp(1.6rem, 4vw, 2.4rem);
+    margin:4px 0 2px;
+    color:var(--navy);
+  }
+  .sub{
+    font-size:1rem;
+    color:var(--teal);
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  .stats{
+    display:flex;
+    gap:18px;
+    margin:12px 0 20px;
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+  }
+  .stat{
+    background:#fff;
+    border-radius:16px;
+    padding:8px 18px;
+    box-shadow:0 3px 0 rgba(28,58,82,0.12);
+    font-size:1rem;
+    color:var(--navy);
+  }
+  .stat span{color:var(--teal); font-weight:700;}
+
+  .board{
+    display:grid;
+    grid-template-columns:repeat(4, minmax(70px, 130px));
+    gap:14px;
+    perspective:1000px;
+  }
+  @media (min-width:520px){
+    .board{ grid-template-columns:repeat(5, minmax(80px,130px)); }
+  }
+
+  .card{
+    aspect-ratio:3/4;
+    position:relative;
+    cursor:pointer;
+    transform-style:preserve-3d;
+    transition:transform 0.5s cubic-bezier(.2,.9,.3,1.2);
+  }
+  .card.flipped{ transform:rotateY(180deg); }
+  .card.matched{ cursor:default; }
+  .card.matched .card-face{ box-shadow:0 0 0 4px var(--green), 0 4px 0 rgba(0,0,0,0.08); }
+
+  .card-face{
+    position:absolute; inset:0;
+    border-radius:16px;
+    backface-visibility:hidden;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+    box-shadow:0 4px 0 rgba(28,58,82,0.18);
+  }
+  .card-back{
+    background:linear-gradient(135deg, var(--card-back-1), var(--card-back-2));
+    font-size:2rem;
+  }
+  .card-back::after{
+    content:"🔥";
+  }
+  .card-front{
+    background:#fff;
+    transform:rotateY(180deg);
+    padding:4px;
+  }
+  .card-front img{
+    width:100%; height:100%; object-fit:cover; border-radius:12px;
+  }
+
+  .win-banner{
+    display:none;
+    margin-top:26px;
+    text-align:center;
+    background:#fff;
+    border-radius:20px;
+    padding:20px 30px;
+    box-shadow:0 6px 0 rgba(28,58,82,0.15);
+    font-family:'Fredoka', sans-serif;
+  }
+  .win-banner.show{ display:block; animation:pop .4s ease; }
+  @keyframes pop{ from{transform:scale(.8); opacity:0;} to{transform:scale(1); opacity:1;} }
+  .win-banner h2{ color:var(--gold); margin:0 0 6px; font-size:1.6rem; }
+  .win-banner p{ margin:0 0 14px; color:var(--navy); font-weight:600; }
+  button.restart{
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    background:var(--teal);
+    color:#fff;
+    border:none;
+    border-radius:14px;
+    padding:10px 22px;
+    font-size:1rem;
+    cursor:pointer;
+    box-shadow:0 3px 0 #084a5c;
+  }
+  button.restart:active{ transform:translateY(2px); box-shadow:none; }
+
+  footer{
+    margin-top:40px;
+    font-size:0.8rem;
+    color:#8a94a0;
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">🔥 EnciendeIA</div>
+  <h1>Memorama de Septiembre</h1>
+  <div class="sub">1er grado · Encuentra las parejas</div>
+</header>
+
+<div class="stats">
+  <div class="stat">Movimientos: <span id="moves">0</span></div>
+  <div class="stat">Parejas: <span id="found">0</span>/5</div>
+</div>
+
+<div class="board" id="board"></div>
+
+<div class="win-banner" id="winBanner">
+  <h2>¡Lo lograste! 🎉</h2>
+  <p id="winText"></p>
+  <button class="restart" onclick="startGame()">Jugar de nuevo</button>
+</div>
+
+<footer>EnciendeIA — Materiales que Transforman</footer>
+
+<script>
+const IMAGES = [
+  { src: 'assets/08sep_color.jpg', name: '8 de septiembre' },
+  { src: 'assets/13sep_color.jpg', name: '13 de septiembre' },
+  { src: 'assets/1516sep_color.jpg', name: '15-16 de septiembre' },
+  { src: 'assets/19sep_color.jpg', name: '19 de septiembre' },
+  { src: 'assets/21sep_paloma_color.jpg', name: '21 de septiembre' },
+];
+
+let board, first, second, lock, moves, found;
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function startGame(){
+  const boardEl = document.getElementById('board');
+  boardEl.innerHTML = '';
+  first = null; second = null; lock = false; moves = 0; found = 0;
+  document.getElementById('moves').textContent = 0;
+  document.getElementById('found').textContent = 0;
+  document.getElementById('winBanner').classList.remove('show');
+
+  let deck = shuffle([...IMAGES, ...IMAGES].map((c,i)=>({...c, uid:i})));
+
+  deck.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.name = item.name;
+    card.innerHTML = `
+      <div class="card-face card-back"></div>
+      <div class="card-face card-front"><img src="${item.src}" alt="${item.name}"></div>
+    `;
+    card.addEventListener('click', ()=>flip(card));
+    boardEl.appendChild(card);
+  });
+}
+
+function flip(card){
+  if(lock || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+  card.classList.add('flipped');
+  if(!first){ first = card; return; }
+  second = card;
+  moves++;
+  document.getElementById('moves').textContent = moves;
+  lock = true;
+
+  if(first.dataset.name === second.dataset.name){
+    first.classList.add('matched');
+    second.classList.add('matched');
+    found++;
+    document.getElementById('found').textContent = found;
+    first = null; second = null; lock = false;
+    if(found === IMAGES.length){
+      setTimeout(()=>{
+        document.getElementById('winText').textContent = `Encontraste las 5 parejas en ${moves} movimientos.`;
+        document.getElementById('winBanner').classList.add('show');
+      }, 400);
+    }
+  } else {
+    setTimeout(()=>{
+      first.classList.remove('flipped');
+      second.classList.remove('flipped');
+      first = null; second = null; lock = false;
+    }, 900);
+  }
+}
+
+startGame();
+</script>
+</body>
+</html>
