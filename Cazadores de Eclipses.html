@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Cazadores de Eclipses — EnciendeIA</title>
+<style>
+  body { font-family: Arial, sans-serif; background: linear-gradient(180deg,#0b2038,#123a5c); color: white; margin:0; padding:20px; text-align:center; }
+  h1 { color: #ffb703; }
+  .scene { background: #0d2b45; border-radius: 16px; padding: 30px; max-width: 480px; margin: 20px auto; position: relative; height: 220px; }
+  .sun { position:absolute; left:20px; top:90px; width:50px; height:50px; background:#ffcf40; border-radius:50%; }
+  .earth { position:absolute; top:85px; width:40px; height:40px; background:#3a86ff; border-radius:50%; }
+  .moon { position:absolute; top:95px; width:20px; height:20px; background:#ccc; border-radius:50%; }
+  button.opt { display:block; width:80%; margin:10px auto; padding:14px; font-size:18px; border:none; border-radius:10px; background:#0086A8; color:white; cursor:pointer; }
+  button.opt:hover { background:#00a6d1; }
+  #feedback { font-size:20px; min-height:40px; margin-top:10px; font-weight:bold; }
+  #score { font-size:16px; color:#ffb703; }
+  #next { padding:10px 20px; font-size:16px; background:#f0a01e; border:none; border-radius:8px; cursor:pointer; display:none; }
+</style>
+</head>
+<body>
+<h1>🔭 Cazadores de Eclipses</h1>
+<p>Observa la posición de la Tierra, la Luna y el Sol. ¿Qué está pasando?</p>
+<div class="scene" id="scene"></div>
+<div id="options"></div>
+<div id="feedback"></div>
+<div id="score">Aciertos: 0 / 0</div>
+<button id="next" onclick="nextRound()">Siguiente →</button>
+
+<script>
+const rounds = [
+  { desc: "El Sol, la Luna y la Tierra están alineados, con la Luna en medio, de día.",
+    correct: "Eclipse solar",
+    explain: "La Luna se interpone entre el Sol y la Tierra, bloqueando la luz solar durante el día: eclipse solar." },
+  { desc: "El Sol, la Tierra y la Luna están alineados, con la Tierra en medio, de noche.",
+    correct: "Eclipse lunar",
+    explain: "La Tierra se interpone entre el Sol y la Luna, proyectando su sombra sobre la Luna: eclipse lunar." },
+  { desc: "La Luna está cerca de estar entre el Sol y la Tierra, pero un poco fuera de línea recta.",
+    correct: "Ningún eclipse",
+    explain: "Si los tres cuerpos no están perfectamente alineados, la sombra no cae sobre la Tierra ni sobre la Luna: no hay eclipse." },
+  { desc: "La Tierra gira sobre sí misma, de noche, sin que el Sol y la Luna estén alineados con ella.",
+    correct: "Ningún eclipse",
+    explain: "Es solo la rotación normal de la Tierra causando la noche — no hay alineación con el Sol y la Luna." },
+  { desc: "La Tierra está casi entre el Sol y la Luna, pero un poco fuera de línea recta.",
+    correct: "Ningún eclipse",
+    explain: "Sin alineación exacta, la sombra de la Tierra no llega a cubrir la Luna: no hay eclipse." },
+  { desc: "La Luna, el Sol y la Tierra están perfectamente alineados, con la Luna en medio, a plena luz del día.",
+    correct: "Eclipse solar",
+    explain: "De nuevo la Luna tapa al Sol visto desde la Tierra: eclipse solar." }
+];
+
+let order = [...rounds].sort(() => Math.random() - 0.5);
+let idx = 0, correct = 0, total = 0;
+const options = ["Eclipse solar", "Eclipse lunar", "Ningún eclipse"];
+
+function render() {
+  const r = order[idx];
+  document.getElementById("scene").innerHTML = `<p style="padding-top:70px;">${r.desc}</p>`;
+  const opts = document.getElementById("options");
+  opts.innerHTML = "";
+  options.forEach(o => {
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.textContent = o;
+    b.onclick = () => check(o, r);
+    opts.appendChild(b);
+  });
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("next").style.display = "none";
+}
+
+function check(choice, r) {
+  total++;
+  const fb = document.getElementById("feedback");
+  if (choice === r.correct) {
+    correct++;
+    fb.style.color = "#4ade80";
+    fb.textContent = "¡Correcto! " + r.explain;
+  } else {
+    fb.style.color = "#f87171";
+    fb.textContent = "No exactamente. " + r.explain;
+  }
+  document.getElementById("score").textContent = `Aciertos: ${correct} / ${total}`;
+  document.querySelectorAll("button.opt").forEach(b => b.disabled = true);
+  document.getElementById("next").style.display = "inline-block";
+}
+
+function nextRound() {
+  idx = (idx + 1) % order.length;
+  if (idx === 0) order = [...rounds].sort(() => Math.random() - 0.5);
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
