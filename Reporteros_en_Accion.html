@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Reporteros en Acción — EnciendeIA</title>
+<style>
+  body { font-family: Arial, sans-serif; background: linear-gradient(180deg,#0b2038,#123a5c); color: white; margin:0; padding:20px; text-align:center; }
+  h1 { color: #ffb703; }
+  .scene { background: #0d2b45; border-radius: 16px; padding: 30px; max-width: 480px; margin: 20px auto; position: relative; min-height: 160px; display:flex; align-items:center; justify-content:center; }
+  .tag { display:inline-block; background:#0086A8; color:white; font-size:13px; padding:4px 12px; border-radius:20px; margin-bottom:14px; }
+  button.opt { display:block; width:80%; margin:10px auto; padding:14px; font-size:18px; border:none; border-radius:10px; background:#0086A8; color:white; cursor:pointer; }
+  button.opt:hover { background:#00a6d1; }
+  button.opt:disabled { opacity: 0.6; cursor: default; }
+  #feedback { font-size:19px; min-height:50px; margin-top:10px; font-weight:bold; }
+  #score { font-size:16px; color:#ffb703; }
+  #next { padding:10px 20px; font-size:16px; background:#f0a01e; border:none; border-radius:8px; cursor:pointer; display:none; }
+</style>
+</head>
+<body>
+<h1>📰 Reporteros en Acción</h1>
+<p>Lee cada tarjeta y decide qué tipo de pregunta o frase es.</p>
+<div class="scene" id="scene"></div>
+<div id="options"></div>
+<div id="feedback"></div>
+<div id="score">Aciertos: 0 / 0</div>
+<button id="next" onclick="nextRound()">Siguiente →</button>
+
+<script>
+const rounds = [
+  { tag: "PREGUNTA", desc: "¿Cómo se llama usted?",
+    options: ["Pregunta abierta", "Pregunta cerrada"], correct: "Pregunta cerrada",
+    explain: "Se responde con un solo dato concreto (el nombre) — es una pregunta cerrada." },
+  { tag: "PREGUNTA", desc: "¿Qué es lo que más le gusta de su trabajo?",
+    options: ["Pregunta abierta", "Pregunta cerrada"], correct: "Pregunta abierta",
+    explain: "Invita a explicar con más detalle, no se responde con un solo dato — es una pregunta abierta." },
+  { tag: "PREGUNTA", desc: "¿Ha vivido aquí toda su vida?",
+    options: ["Pregunta abierta", "Pregunta cerrada"], correct: "Pregunta cerrada",
+    explain: "Se puede responder con sí o no — es una pregunta cerrada." },
+  { tag: "PREGUNTA", desc: "¿Cómo ha cambiado este lugar desde que usted era niño?",
+    options: ["Pregunta abierta", "Pregunta cerrada"], correct: "Pregunta abierta",
+    explain: "Pide una explicación amplia, con recuerdos y opiniones — es una pregunta abierta." },
+  { tag: "FRASE DE LA ENTREVISTA", desc: "\"Llevo 15 años trabajando en esta panadería.\"",
+    options: ["Hecho", "Opinión"], correct: "Hecho",
+    explain: "Es un dato verificable (el tiempo trabajando) — es un hecho." },
+  { tag: "FRASE DE LA ENTREVISTA", desc: "\"Creo que el pan de aquí es el mejor de la colonia.\"",
+    options: ["Hecho", "Opinión"], correct: "Opinión",
+    explain: "Expresa un punto de vista personal, no algo verificable para todos — es una opinión." },
+  { tag: "FRASE DE LA ENTREVISTA", desc: "\"La escuela se construyó en 1985.\"",
+    options: ["Hecho", "Opinión"], correct: "Hecho",
+    explain: "Es un dato verificable — es un hecho." },
+  { tag: "FRASE DE LA ENTREVISTA", desc: "\"Pienso que deberían poner más áreas verdes en el parque.\"",
+    options: ["Hecho", "Opinión"], correct: "Opinión",
+    explain: "Es una postura personal sobre lo que \"debería\" pasar — es una opinión." }
+];
+
+let order = [...rounds].sort(() => Math.random() - 0.5);
+let idx = 0, correct = 0, total = 0;
+
+function render() {
+  const r = order[idx];
+  document.getElementById("scene").innerHTML = `<div><div class="tag">${r.tag}</div><p style="font-size:20px;">${r.desc}</p></div>`;
+  const opts = document.getElementById("options");
+  opts.innerHTML = "";
+  r.options.forEach(o => {
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.textContent = o;
+    b.onclick = () => check(o, r);
+    opts.appendChild(b);
+  });
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("next").style.display = "none";
+}
+
+function check(choice, r) {
+  total++;
+  const fb = document.getElementById("feedback");
+  if (choice === r.correct) {
+    correct++;
+    fb.style.color = "#4ade80";
+    fb.textContent = "¡Correcto! " + r.explain;
+  } else {
+    fb.style.color = "#f87171";
+    fb.textContent = "No exactamente. " + r.explain;
+  }
+  document.getElementById("score").textContent = `Aciertos: ${correct} / ${total}`;
+  document.querySelectorAll("button.opt").forEach(b => b.disabled = true);
+  document.getElementById("next").style.display = "inline-block";
+}
+
+function nextRound() {
+  idx = (idx + 1) % order.length;
+  if (idx === 0) order = [...rounds].sort(() => Math.random() - 0.5);
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
