@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>El Reto de Basura Cero — EnciendeIA</title>
+<style>
+  body { font-family: Arial, sans-serif; background: linear-gradient(180deg,#fff6e6,#ffe9c2); color: #1a1a1a; margin:0; padding:20px; text-align:center; }
+  h1 { color: #a15c00; }
+  .scene { background: #ffffff; border: 3px solid #F4A100; border-radius: 16px; padding: 20px; max-width: 520px; margin: 20px auto; }
+  .escena-emoji { font-size: 70px; line-height: 1; }
+  .desc { font-size: 17px; margin-top: 10px; text-align: left; }
+  button.opt { display:block; width:90%; margin:10px auto; padding:14px; font-size:16px; border:none; border-radius:10px; background:#00B4D8; color:white; cursor:pointer; text-align:left; padding-left: 20px; }
+  button.opt:hover { background:#0093b0; }
+  button.opt:disabled { opacity: 0.6; cursor: default; }
+  #feedback { font-size:17px; min-height:50px; margin-top:10px; font-weight:bold; max-width:520px; margin-left:auto; margin-right:auto; text-align:left; }
+  #score { font-size:16px; color:#F4A100; font-weight:bold; }
+  #next { padding:10px 20px; font-size:16px; background:#F4A100; border:none; border-radius:8px; cursor:pointer; display:none; color:white; }
+  #final { display:none; background:#ffffff; border: 3px solid #F4A100; border-radius:16px; padding:30px; max-width:520px; margin:20px auto; }
+  #final h2 { color:#a15c00; margin-top:0; }
+  #final p { font-size:16px; line-height:1.5; }
+  #playAgain { padding:12px 24px; font-size:16px; background:#00B4D8; color:white; border:none; border-radius:10px; cursor:pointer; margin-top:10px; }
+  #playAgain:hover { background:#0093b0; }
+</style>
+</head>
+<body>
+<h1>♻️ El Reto de Basura Cero</h1>
+<p>Lee la escena. ¿Cuál es la mejor forma de actuar como buen Guardián de Basura Cero?</p>
+<div class="scene" id="scene"></div>
+<div id="options"></div>
+<div id="feedback"></div>
+<div id="score">Aciertos: 0 / 0</div>
+<button id="next" onclick="nextRound()">Siguiente →</button>
+
+<div id="final">
+  <h2>🏆 ¡Turno completado!</h2>
+  <p id="finalScore"></p>
+  <p>Ya lo sabes: observa con atención, clasifica con criterio, analiza tus datos, y propón soluciones concretas y medibles.</p>
+  <button id="playAgain" onclick="restart()">Jugar de nuevo</button>
+</div>
+
+<script>
+const rounds = [
+  { emoji: "🗑️", desc: "Estás haciendo la auditoría de residuos y encuentras una cáscara de plátano mezclada con papel.",
+    options: ["Separarla en la categoría de orgánico, no en reciclable", "Contarla como reciclable porque 'ya está mezclada'"],
+    correct: "Separarla en la categoría de orgánico, no en reciclable",
+    explain: "¡Correcto! Una auditoría real requiere clasificar cada residuo en su categoría verdadera, aunque cueste más trabajo separar." },
+  { emoji: "📊", desc: "Terminaste de contar los residuos de tu equipo y la categoría 'no reciclable' salió mucho más alta que las otras.",
+    options: ["Cambiar el número para que se vea más parejo con las otras categorías", "Anotar el dato real, aunque no sea el que esperabas"],
+    correct: "Anotar el dato real, aunque no sea el que esperabas",
+    explain: "¡Correcto! Un buen Guardián de Basura Cero registra los datos reales, no los que hubiera preferido encontrar — de eso depende que la propuesta funcione de verdad." },
+  { emoji: "💡", desc: "Tu equipo está diseñando su propuesta y alguien sugiere escribir simplemente: 'vamos a usar menos plástico'.",
+    options: ["Aceptar esa propuesta tal cual, porque suena bien", "Hacerla más concreta y medible, como 'reducir a la mitad los vasos desechables en un mes'"],
+    correct: "Hacerla más concreta y medible, como 'reducir a la mitad los vasos desechables en un mes'",
+    explain: "¡Correcto! Una propuesta que no se puede medir no permite saber si de verdad funcionó — lo concreto y medible es lo que hace la diferencia." },
+  { emoji: "🧤", desc: "Vas a empezar a separar la basura del bote del salón para tu auditoría.",
+    options: ["Usar guantes o una bolsa para no tocar los residuos directamente", "Tocar todo directamente porque 'ya me lavaré las manos después'"],
+    correct: "Usar guantes o una bolsa para no tocar los residuos directamente",
+    explain: "¡Correcto! Manipular residuos con higiene (guantes o bolsas) es una parte esencial de hacer una auditoría de forma segura." },
+  { emoji: "🥤", desc: "En tu gráfica de barras, la categoría de vasos y envolturas de plástico de la cooperativa es, por mucho, la más alta.",
+    options: ["Ignorar ese dato y enfocar la propuesta en otra categoría más fácil", "Diseñar la propuesta enfocada justo en esa categoría, porque ahí está el mayor impacto posible"],
+    correct: "Diseñar la propuesta enfocada justo en esa categoría, porque ahí está el mayor impacto posible",
+    explain: "¡Correcto! Un buen análisis de datos sirve para enfocar el esfuerzo donde realmente va a tener más impacto." },
+  { emoji: "📅", desc: "Pasó un mes desde que se aplicó la propuesta del Reto de Basura Cero en la cooperativa escolar.",
+    options: ["Suponer que funcionó porque 'se ve menos basura'", "Hacer una nueva auditoría y comparar los datos con los del mes anterior"],
+    correct: "Hacer una nueva auditoría y comparar los datos con los del mes anterior",
+    explain: "¡Correcto! La única forma de saber si una propuesta medible realmente funcionó es medirla de nuevo y comparar los datos." }
+];
+
+let order = [...rounds].sort(() => Math.random() - 0.5);
+let idx = 0, correct = 0, total = 0;
+
+function render() {
+  const r = order[idx];
+  document.getElementById("next").textContent = (idx === order.length - 1) ? "Ver resultado →" : "Siguiente →";
+  document.getElementById("scene").innerHTML = `<div class="escena-emoji">${r.emoji}</div><div class="desc">${r.desc}</div>`;
+  const opts = document.getElementById("options");
+  opts.innerHTML = "";
+  r.options.forEach(o => {
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.textContent = o;
+    b.onclick = () => check(o, r);
+    opts.appendChild(b);
+  });
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("next").style.display = "none";
+}
+
+function check(choice, r) {
+  total++;
+  const fb = document.getElementById("feedback");
+  if (choice === r.correct) {
+    correct++;
+    fb.style.color = "#16a34a";
+    fb.textContent = r.explain;
+  } else {
+    fb.style.color = "#dc2626";
+    fb.textContent = "No exactamente. " + r.explain;
+  }
+  document.getElementById("score").textContent = `Aciertos: ${correct} / ${total}`;
+  document.querySelectorAll("button.opt").forEach(b => b.disabled = true);
+  document.getElementById("next").style.display = "inline-block";
+}
+
+function nextRound() {
+  if (idx < order.length - 1) {
+    idx++;
+    render();
+  } else {
+    showFinal();
+  }
+}
+
+function showFinal() {
+  document.querySelector(".scene").style.display = "none";
+  document.getElementById("options").style.display = "none";
+  document.getElementById("feedback").style.display = "none";
+  document.getElementById("score").style.display = "none";
+  document.getElementById("next").style.display = "none";
+  document.getElementById("finalScore").textContent = `Respondiste correctamente ${correct} de ${total} rondas.`;
+  document.getElementById("final").style.display = "block";
+}
+
+function restart() {
+  order = [...rounds].sort(() => Math.random() - 0.5);
+  idx = 0; correct = 0; total = 0;
+  document.getElementById("final").style.display = "none";
+  document.querySelector(".scene").style.display = "block";
+  document.getElementById("options").style.display = "block";
+  document.getElementById("feedback").style.display = "block";
+  document.getElementById("score").style.display = "block";
+  document.getElementById("score").textContent = "Aciertos: 0 / 0";
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
