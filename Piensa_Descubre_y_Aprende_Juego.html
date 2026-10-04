@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>¡Piensa, Descubre y Aprende! — Trimestre 1</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@600;700;800&display=swap');
+:root{
+  --canopy:#1F4B3F; --canopy-dark:#123027; --parchment:#FBF3E1; --parchment-dk:#F3E6C8;
+  --toucan:#F2762E; --toucan-dk:#C85A1B; --sky:#3AAED8; --sky-dk:#1F84AC;
+  --gold:#F4B942; --gold-dk:#C6900F; --leaf:#4E9A51; --leaf-dk:#357238;
+  --coral:#E8604C; --ink:#20342C; --ink-soft:#5B6F65;
+  --r16:16px; --r22:22px; --r28:28px;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{ margin:0; min-height:100vh; font-family:'Nunito',sans-serif; color:var(--ink);
+  background: radial-gradient(circle at 12% 8%, rgba(244,185,66,.16), transparent 40%),
+    radial-gradient(circle at 90% 85%, rgba(58,174,216,.14), transparent 45%), var(--parchment);
+  display:flex; justify-content:center; align-items:flex-start; }
+.app{ width:100%; max-width:900px; min-height:100vh; position:relative; padding-bottom:40px; }
+h1,h2,h3{ font-family:'Baloo 2',sans-serif; margin:0; }
+.screen{ display:none; flex-direction:column; animation:fade .25s ease; }
+.screen.on{ display:flex; }
+@keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+button{ font-family:'Baloo 2',sans-serif; cursor:pointer; border:none; }
+.brand-bar{ background:linear-gradient(160deg,var(--canopy),var(--canopy-dark)); padding:30px 36px 36px; border-radius:0 0 36px 36px; position:relative; overflow:hidden; }
+.brand-bar::after{ content:''; position:absolute; left:0; right:0; bottom:-2px; height:16px; background:repeating-linear-gradient(115deg,var(--leaf) 0 20px, var(--leaf-dk) 20px 40px); opacity:.5; }
+.brand-row{ display:flex; align-items:center; gap:16px; }
+#s-map .brand-row{ margin-top:46px; }
+.brand-logo{ width:64px; height:64px; border-radius:18px; background:rgba(255,255,255,.16); display:flex; align-items:center; justify-content:center; font-size:34px; border:1px solid rgba(255,255,255,.3); flex-shrink:0; }
+.brand-name{ color:#fff; font-weight:800; font-size:30px; letter-spacing:-.2px; }
+#s-map .brand-name{ font-size:24px; line-height:1.15; }
+.brand-tag{ color:#CFE8DC; font-size:16px; font-weight:700; margin-top:2px; }
+.back-btn{ width:48px; height:48px; border-radius:14px; background:var(--parchment-dk); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; position:absolute; top:28px; left:28px; }
+.acc-btn{ position:absolute; top:28px; right:28px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); border-radius:50%; width:50px; height:50px; font-size:22px; color:#fff; }
+.acc-overlay{ position:fixed; inset:0; background:rgba(18,48,39,.55); display:flex; align-items:flex-end; justify-content:center; z-index:500; }
+.acc-overlay.hidden{ display:none; }
+.acc-panel{ width:100%; max-width:900px; background:var(--parchment); border-radius:30px 30px 0 0; padding:30px 36px 36px; max-height:86vh; overflow:auto; }
+.acc-panel h3{ font-size:24px; color:var(--canopy); margin-bottom:4px; }
+.acc-panel .acc-sub{ font-size:15px; color:var(--ink-soft); margin-bottom:20px; line-height:1.4; }
+.acc-row{ display:flex; align-items:center; justify-content:space-between; gap:16px; background:#fff; border-radius:18px; padding:18px 20px; margin-bottom:12px; }
+.acc-row-txt .acc-label{ font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; color:var(--ink); }
+.acc-row-txt .acc-desc{ font-size:14px; color:var(--ink-soft); margin-top:2px; }
+.acc-switch{ width:58px; height:34px; border-radius:999px; background:var(--parchment-dk); position:relative; flex-shrink:0; border:none; }
+.acc-switch::after{ content:''; position:absolute; top:3px; left:3px; width:28px; height:28px; border-radius:50%; background:#fff; transition:.15s; box-shadow:0 1px 3px rgba(0,0,0,.25); }
+.acc-switch.on{ background:var(--leaf); }
+.acc-switch.on::after{ left:27px; }
+.acc-close{ width:100%; margin-top:8px; padding:18px; background:var(--canopy); color:#fff; border-radius:999px; font-weight:800; font-size:18px; }
+.app.a11y-large .prompt{ font-size:30px; }
+.app.a11y-large .opt{ font-size:28px; padding:26px 10px; }
+.app.a11y-large .l-instruction{ font-size:19px; }
+.app.a11y-large .brand-name{ font-size:34px; }
+.app.a11y-contrast{ --parchment:#FFFFFF; --parchment-dk:#E4E4E4; --ink:#000000; --ink-soft:#222222; }
+.app.a11y-contrast .opt{ border-width:5px; }
+.app.a11y-contrast .card{ box-shadow:0 0 0 3px #000; }
+.app.a11y-contrast .opt.correct{ background:#CDEFCD; border-color:#0B6B0B; }
+.app.a11y-contrast .opt.wrong{ background:#FBD3CC; border-color:#B32D18; }
+.app.a11y-dyslexia, .app.a11y-dyslexia .prompt, .app.a11y-dyslexia .opt, .app.a11y-dyslexia .l-instruction{ letter-spacing:0.06em; word-spacing:0.18em; line-height:1.7; }
+.app.a11y-dyslexia .prompt{ font-family:'Comic Sans MS','Baloo 2',sans-serif; }
+.app.a11y-calm .zone-deco{ display:none; }
+.app.a11y-calm .leaf-node.cur{ animation:none; }
+.app.a11y-simple .node-label{ display:none; }
+.parent-btn{ position:absolute; top:28px; right:90px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); border-radius:50%; width:50px; height:50px; font-size:22px; color:#fff; }
+.sound-btn{ position:absolute; top:28px; right:152px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); border-radius:50%; width:50px; height:50px; font-size:22px; color:#fff; }
+#confettiCanvas{ position:fixed; inset:0; pointer-events:none; z-index:900; }
+.score-row{ display:flex; align-items:center; gap:14px; background:#fff; border-radius:16px; padding:14px 18px; margin-bottom:12px; }
+.score-row .sc-name{ flex:1; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:18px; color:var(--ink); }
+.score-row .sc-pts{ font-weight:800; font-size:22px; color:var(--canopy); min-width:34px; text-align:center; }
+.sc-btn{ width:38px; height:38px; border-radius:50%; background:var(--parchment-dk); font-weight:800; font-size:18px; color:var(--ink); }
+.sc-btn.plus{ background:var(--leaf); color:#fff; }
+.sc-del{ background:none; color:var(--coral); font-size:20px; padding:4px 8px; }
+.sc-add-row{ display:flex; gap:10px; margin-bottom:20px; }
+.sc-add-row input{ flex:1; border:3px solid var(--parchment-dk); border-radius:14px; padding:14px 16px; font-size:17px; font-family:'Nunito',sans-serif; }
+.sc-add-row button{ background:var(--toucan); color:#fff; border-radius:14px; padding:0 22px; font-weight:800; font-size:16px; }
+.pin-input{ font-family:'Baloo 2',sans-serif; font-weight:800; font-size:34px; letter-spacing:16px; text-align:center; border:none; border-bottom:4px dotted var(--gold-dk); padding:10px 0; width:100%; margin:16px 0 22px; background:transparent; color:var(--ink); }
+.pin-input:focus{ outline:none; }
+.parent-item{ display:flex; align-items:center; gap:14px; background:#fff; border-radius:16px; padding:16px 18px; margin-bottom:12px; }
+.parent-item .pi-ico{ font-size:24px; flex-shrink:0; }
+.parent-item .pi-txt{ font-size:15px; color:var(--ink); line-height:1.4; }
+.parent-item .pi-txt b{ color:var(--canopy); }
+.pin-error{ color:var(--coral); font-weight:800; font-size:14px; text-align:center; min-height:18px; margin-top:-12px; margin-bottom:8px; }
+.map-scroll{ padding:34px 36px 20px; display:flex; flex-direction:column; align-items:center; gap:0; position:relative; }
+.zone-deco{ position:absolute; font-size:50px; opacity:.14; z-index:0; pointer-events:none; }
+.vine{ width:6px; height:46px; background:repeating-linear-gradient(var(--leaf) 0 8px, transparent 8px 15px); border-radius:3px; position:relative; z-index:1; }
+.leaf-node{ width:120px; height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; z-index:1; cursor:pointer; border-radius:63% 37% 54% 46% / 55% 45% 42% 58%; border:4px solid transparent; transition:.15s; background:#fff; box-shadow:0 4px 14px rgba(31,75,63,.12); }
+.leaf-node:active{ transform:scale(.95); }
+.leaf-node .le{ font-size:40px; }
+.leaf-node .ln{ font-size:14px; font-weight:800; margin-top:3px; color:var(--ink); text-align:center; max-width:96px; line-height:1.15; }
+.leaf-node.gold{ background:var(--gold); border-color:var(--gold-dk); }
+.leaf-node{ position:relative; }
+.leaf-node .done-badge{ display:none; position:absolute; top:-6px; right:-6px; width:30px; height:30px; border-radius:50%; background:var(--leaf); color:#fff; font-size:16px; font-weight:800; align-items:center; justify-content:center; border:3px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,.2); }
+.leaf-node.done .done-badge{ display:flex; }
+.node-label{ font-size:15px; color:var(--ink-soft); text-align:center; max-width:200px; margin:6px 0 22px; line-height:1.3; font-weight:700; }
+.pda-note{ margin:14px 36px 0; background:#fff; border:2px dashed var(--leaf); border-radius:18px; padding:16px 20px; font-size:16px; color:var(--ink-soft); line-height:1.5; }
+.pda-note b{ color:var(--canopy); }
+.l-instruction{ margin:20px 36px 0; background:#fff; border:2px dashed var(--sky); border-radius:18px; padding:18px 22px; font-size:17px; color:var(--ink); line-height:1.5; display:flex; gap:12px; align-items:flex-start; }
+.l-instruction .ico{ font-size:24px; flex-shrink:0; }
+.card{ margin:24px 36px; background:#fff; border-radius:var(--r28); padding:30px; box-shadow:0 10px 26px rgba(31,75,63,.1); position:relative; }
+.card::before{ content:''; position:absolute; top:0; right:0; width:32px; height:32px; background:linear-gradient(135deg,transparent 50%,var(--parchment-dk) 50%); border-radius:0 var(--r28) 0 0; }
+.scene{ font-size:5.5rem; text-align:center; margin-bottom:10px; }
+.prompt{ font-size:26px; font-weight:800; color:var(--ink); text-align:center; margin-bottom:24px; }
+.opts{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+.opts.c2{ grid-template-columns:repeat(2,1fr); }
+.opt{ border:4px solid var(--parchment-dk); border-radius:20px; padding:22px 10px; background:var(--parchment); text-align:center; font-weight:800; font-size:24px; transition:.12s; min-height:76px; display:flex; align-items:center; justify-content:center; }
+.opt:active{ transform:scale(.96); }
+.num-display{ border:4px solid var(--parchment-dk); border-radius:20px; padding:22px 10px; background:#fff; text-align:center; font-weight:800; font-size:24px; min-height:76px; display:flex; align-items:center; justify-content:center; color:var(--ink); }
+.opt.correct{ background:#E1F3E5; border-color:var(--leaf); }
+.opt.wrong{ background:#FBE2DD; border-color:var(--coral); }
+.feedback{ text-align:center; font-weight:800; font-size:20px; margin-top:22px; min-height:28px; color:var(--canopy); }
+.next-btn{ display:block; margin:22px auto 0; background:var(--sky); color:#fff; border-radius:999px; padding:18px 42px; font-weight:800; font-size:19px; box-shadow:0 4px 0 var(--sky-dk); }
+.next-btn.gold{ background:var(--gold); color:var(--canopy-dark); box-shadow:0 4px 0 var(--gold-dk); }
+.hidden{ display:none !important; }
+.grid100{ display:grid; grid-template-columns:repeat(10,1fr); gap:3px; max-width:460px; margin:14px auto 0; border:3px solid var(--canopy); padding:4px; border-radius:10px; }
+.cell100{ aspect-ratio:1; background:#fff; border:1px solid #ddd; cursor:pointer; border-radius:2px; }
+.cell100.on{ background:var(--coral); }
+.frac-grid{ display:grid; gap:6px; max-width:420px; margin:0 auto; }
+.frac-cell{ aspect-ratio:1; border:2px solid #999; background:#fff; border-radius:4px; cursor:pointer; }
+.frac-cell.on{ background:#F6A6A0; }
+.frac-cell.blue{ background:#9FD8DB; }
+.match-row{ display:flex; gap:16px; align-items:center; margin-bottom:14px; }
+.match-card{ flex:1; border-radius:16px; padding:18px; text-align:center; font-weight:800; font-size:20px; cursor:pointer; border:4px solid transparent; color:#fff; }
+.match-card.left{ background:var(--canopy); }
+.match-card.right{ background:var(--coral); }
+.match-card.matched{ border-color:var(--gold); opacity:.5; }
+footer{ text-align:center; color:var(--ink-soft); font-size:13px; font-weight:700; margin-top:20px; }
+.pill-top{ display:inline-block; background:rgba(255,255,255,.18); color:#fff; border-radius:999px; padding:6px 16px; font-size:13px; font-weight:800; letter-spacing:.5px; margin-bottom:10px; }
+</style>
+</head>
+<body>
+<canvas id="confettiCanvas"></canvas>
+<div class="app" id="app">
+
+  <!-- MAP / HOME -->
+  <div class="screen on" id="s-map">
+    <div class="brand-bar">
+      <button class="sound-btn" onclick="toggleMute()" id="soundBtn" aria-label="Sonido">🔊</button>
+      <button class="acc-btn" onclick="openAccPanel()" aria-label="Accesibilidad">♿</button>
+      <button class="parent-btn" onclick="openParentGate()" aria-label="Vista de maestro">👪</button>
+      <div class="brand-row">
+        <div class="brand-logo">🧮</div>
+        <div>
+          <div class="brand-name">¡Piensa, Descubre y Aprende!</div>
+          <div class="brand-tag">Trimestre 1 · 3er grado</div>
+        </div>
+      </div>
+    </div>
+    <div class="map-scroll">
+      <span class="zone-deco" style="top:10px;left:20px">🌿</span>
+      <span class="zone-deco" style="top:160px;right:10px">🍃</span>
+      <button class="leaf-node" style="border-radius:20px" onclick="go('s-score')"><div class="le">🏆</div><div class="ln">Marcador de equipos</div></button>
+      <div class="node-label">Lleva el puntaje y descarga el avance en CSV</div>
+      <div class="vine"></div>
+      <div class="leaf-node" id="node-a1" onclick="go('a1')"><span class="done-badge">✓</span><div class="le">🃏</div><div class="ln">1. Baraja numérica</div></div>
+      <div class="node-label">Equipos de 4 · valor posicional</div>
+      <div class="vine"></div>
+      <div class="leaf-node gold" id="node-a2" onclick="go('a2')"><span class="done-badge">✓</span><div class="le">⚖️</div><div class="ln">2. Comparamos números</div></div>
+      <div class="node-label">Mayor que / menor que</div>
+      <div class="vine"></div>
+      <div class="leaf-node" id="node-a3" onclick="go('a3')"><span class="done-badge">✓</span><div class="le">📏</div><div class="ln">3. Mediciones más exactas</div></div>
+      <div class="node-label">Longitud, masa y capacidad</div>
+      <div class="vine"></div>
+      <div class="leaf-node gold" id="node-a4" onclick="go('a4')"><span class="done-badge">✓</span><div class="le">🍫</div><div class="ln">4. Repartos equitativos</div></div>
+      <div class="node-label">Repartos y fracciones</div>
+      <div class="vine"></div>
+      <div class="leaf-node" id="node-a5" onclick="go('a5')"><span class="done-badge">✓</span><div class="le">🟪</div><div class="ln">5. Fracciones</div></div>
+      <div class="node-label">Identificar y representar</div>
+      <div class="vine"></div>
+      <div class="leaf-node gold" id="node-a6" onclick="go('a6')"><span class="done-badge">✓</span><div class="le">🔟</div><div class="ln">6. Décimos y centésimos</div></div>
+      <div class="node-label">Tripas de gato · ¿Quién tiene la explicación?</div>
+    </div>
+    <footer>Cuadernillo de Apoyo Curricular SEP · Matemáticas · Fase 4 — EnciendeIA</footer>
+  </div>
+
+  <!-- MARCADOR DE EQUIPOS -->
+  <div class="screen" id="s-score">
+    <div class="brand-bar">
+      <button class="back-btn" onclick="go('s-map')">←</button>
+      <div class="brand-row" style="margin-left:60px">
+        <div class="brand-logo">🏆</div>
+        <div><div class="brand-name">Marcador de equipos</div><div class="brand-tag">Lleva el avance y descárgalo en CSV</div></div>
+      </div>
+    </div>
+    <div class="l-instruction"><span class="ico">📋</span><span>Agrega el nombre de cada equipo (o alumno) y dale +1 cada vez que respondan correctamente en una actividad. Al final, descarga el avance en un archivo CSV para tu registro.</span></div>
+    <div class="card">
+      <div class="sc-add-row">
+        <input id="scNewName" type="text" placeholder="Nombre del equipo o alumno" onkeydown="if(event.key==='Enter')addScoreTeam()">
+        <button onclick="addScoreTeam()">+ Agregar</button>
+      </div>
+      <div id="scoreList"></div>
+      <div class="feedback" id="scoreEmpty">Aún no agregas ningún equipo.</div>
+    </div>
+    <button class="next-btn gold" onclick="exportScoreCSV()">⬇️ Descargar avance (CSV)</button>
+    <button class="next-btn" onclick="go('s-map')">Volver al menú</button>
+  </div>
+
+  <!-- ACTIVIDAD 1: BARAJA NUMÉRICA -->
+  <div class="screen" id="a1">
+    <div class="brand-bar">
+      <button class="back-btn" onclick="go('s-map')">←</button>
+      <button class="acc-btn" onclick="openAccPanel()" aria-label="Accesibilidad">♿</button>
+      <div class="brand-row" style="margin-left:60px">
+        <div class="brand-logo">🃏</div>
+        <div><div class="brand-name">Baraja numérica</div><div class="brand-tag">Actividad 1 de 6 · p. 24-25</div></div>
+      </div>
+    </div>
+    <div class="l-instruction"><span class="ico">📖</span><span>Equipos de 4. Cada quien tiene tarjetas de unidades, decenas, centenas y millares, más 10 tarjetas blancas. Se muestra una tarjeta blanca y, por turnos, arman ese número combinando tarjetas de colores. ¡Gana quien lo arma primero!</span></div>
+    <div class="card">
+      <div class="prompt">¿Cómo se descompone este número?</div>
+      <div class="scene" id="barajaNum" style="font-family:'Baloo 2',sans-serif;font-weight:800;color:var(--canopy)">3027</div>
+      <div class="opts" id="barajaOpts"></div>
+      <div class="feedback" id="barajaFeedback"></div>
+    </div>
+    <button class="next-btn gold" onclick="newBaraja()">🔀 Nueva tarjeta blanca</button>
+    <button class="next-btn" onclick="go('s-map')">Volver al menú</button>
+  </div>
+
+  <!-- ACTIVIDAD 2: COMPARAMOS NÚMEROS -->
+  <div class="screen" id="a2">
+    <div class="brand-bar">
+      <button class="back-btn" onclick="go('s-map')">←</button>
+      <button class="acc-btn" onclick="openAccPanel()" aria-label="Accesibilidad">♿</button>
+      <div class="brand-row" style="margin-left:60px">
+        <div class="brand-logo">⚖️</div>
+        <div><div class="brand-name">Comparamos números</div><div class="brand-tag">Actividad 2 de 6 · p. 25</div></div>
+      </div>
+    </div>
+    <div class="l-instruction"><span class="ico">📖</span><span>Cada integrante escribe 10 números de 4 cifras y prepara tarjetas de "mayor que" y "menor que". Se reparten 3 números por turno y se ordenan según la regla acordada.</span></div>
+    <div class="card">
+      <div class="prompt">¿Cuál es el orden de mayor a menor?</div>
+      <div class="opts c2" id="compNums" style="margin-bottom:10px"></div>
+      <div class="opts" id="compOpts"></div>
+      <div class="feedback" id="compFeedback"></div>
+    </div>
+    <button class="next-btn gold" onclick="newComparamos()">🔀 Nuevos números</button>
+    <button class="next-btn" onclick="go('s-map')">Volver al menú</button>
+  </div>
+
+  <!-- ACTIVIDAD 3: MEDICIONES -->
+  <div class="screen" id="a3">
+    <div class="brand-bar">
+      <button class="back-btn" onclick="go('s-map')">←</button>
+      <button class="acc-btn" onclick="openAccPanel()" aria-label="Accesibilidad">♿</button>
+      <div class="brand-row" style="margin-left:60px">
+        <div class="brand-logo">📏</div>
+        <div><div class="brand-name">Mediciones más exactas</div><div class="brand-tag">Actividad 3 de 6 · p. 25-26</div></div>
+      </div>
+    </div>
+    <div class="l-instruction"><span class="ico">📖</span><span>Por equipos construyen reglas de 1 m, 1/2 m y 1/4 m, rotulan recipientes y arman costalitos de masa. Con ese material comprueban equivalencias.</span></div>
+    <div class="card">
+      <div class="prompt" id="medPrompt">¿Es correcta esta equivalencia?</div>
+      <div class="scene" id="medScene" style="font-size:3rem;font-family:'Baloo 2',sans-serif;font-weight:800;color:var(--canopy)">1/2 m + 1/2 m = 1 m</div>
+      <div class="opts c2" id="medOpts"></div>
+      <div class="feedback" id="medFeedback"></div>
+    </div>
+    <button class="next-btn gold" onclick="newMed()">🔀 Nueva equivalencia</button>
+    <button class="next-btn" onclick="go('s-map')">Volver al menú</button>
+  </div>
+
+  <!-- ACTIVIDAD 4: REPARTOS -->
+  <div class="screen" id="a4">
+    <div class="brand-bar">
+      <button class="back-btn" onclick="go('s-map')">←</button>
+      <button class="acc-btn" onclick="openAccPanel()" aria-label="Accesibilidad">♿</button>
+      <div class="brand-row" style="margin-left:60px">
+        <div class="brand-logo">🍫</div>
+        <div><div class="brand-name">Repartos equitativos</div><div class="brand-tag">Actividad 4 de 6 · p. 26</div></div>
+      </div>
+    </div>
+    <div class="l-instruction"><span class="ico">📖</span><span>Con material concreto se reparte un elemento o conjunto entre varias personas. Antes de repartir, se estima si el resultado será mayor o menor que 1.</span></div>
+    <div class="card">
+      <div class="prompt" id="repPrompt">1 chocolate entre 4 personas. ¿A cuánto le toca a cada quien?</div>
+      <div class="scene">🍫🍫🍫🍫</div>
+      <div class="opts" id="repOpts"></div>
+      <div class="feedback" id="repFeedback"></div>
+    </div>
+    <button class="next-btn gold" onclick="newRep()">🔀 Otro reparto</button>
+    <button class="next-btn" onclick="go('s-map')">Volver al menú</button>
+  </div>
+
+  <!-- ACTIVIDAD 5: FRACCIONES -->
+  <div class="screen" id="a5">
+    <div class="brand-bar">
+      <button class="back-btn" onclick="go('s-map')">←</button>
+      <button class="acc-btn" onclick="openAccPanel()" aria-label="Accesibilidad">♿</button>
+      <div class="brand-row" style="margin-left:60px">
+        <div class="brand-logo">🟪</div>
+        <div><div class="brand-name">Fracciones</div><div class="brand-tag">Actividad 5 de 6 · p. 26-27</div></div>
+      </div>
+    </div>
+    <div class="l-instruction"><span class="ico">📖</span><span>Identificar una fracción en una figura, o representarla con el "fraccionómetro". Toca las celdas para construir la figura en vivo frente al grupo.</span></div>
+    <div class="card">
+      <div class="prompt">¿El color rosa representa 1/2?</div>
+      <div class="frac-grid" id="fracRosa" style="grid-template-columns:repeat(4,1fr);max-width:360px"></div>
+      <div class="opts c2" id="rosaOpts" style="margin-top:20px"></div>
+      <div class="feedback" id="rosaFeedback"></div>
+    </div>
+    <div class="card">
+      <div class="prompt">¿El color azul representa 1/4?</div>
+      <div class="frac-grid" id="fracAzul" style="grid-template-columns:repeat(2,1fr);max-width:220px"></div>
+      <div class="opts c2" id="azulOpts" style="margin-top:20px"></div>
+      <div class="feedback" id="azulFeedback"></div>
+    </div>
+    <button class="next-btn" onclick="go('s-map')">Volver al menú</button>
+  </div>
+
+  <!-- ACTIVIDAD 6: DÉCIMOS Y CENTÉSIMOS -->
+  <div class="screen" id="a6">
+    <div class="brand-bar">
+      <button class="back-btn" onclick="go('s-map')">←</button>
+      <button class="acc-btn" onclick="openAccPanel()" aria-label="Accesibilidad">♿</button>
+      <div class="brand-row" style="margin-left:60px">
+        <div class="brand-logo">🔟</div>
+        <div><div class="brand-name">Décimos y centésimos</div><div class="brand-tag">Actividad 6 de 6 · p. 28-29</div></div>
+      </div>
+    </div>
+    <div class="l-instruction"><span class="ico">📖</span><span>Cuadrícula de 100 para representar décimos y centésimos, más los juegos "Tripas de gato" y "¿Quién tiene la explicación?".</span></div>
+    <div class="card">
+      <div class="prompt">Toca para colorear décimos y centésimos</div>
+      <div class="grid100" id="grid100"></div>
+      <div class="feedback" id="gridLabel">0 celdas coloreadas</div>
+    </div>
+    <div class="card">
+      <div class="prompt">"Tripas de gato" — une cada decimal con su pareja</div>
+      <div id="gatoBoard"></div>
+    </div>
+    <div class="card">
+      <div class="prompt">"¿Quién tiene la explicación?"</div>
+      <div id="quienBoard"></div>
+    </div>
+    <button class="next-btn" onclick="go('s-map')">Volver al menú</button>
+  </div>
+
+</div>
+
+<!-- PANEL DE ACCESIBILIDAD -->
+<div class="acc-overlay hidden" id="accOverlay">
+  <div class="acc-panel">
+    <h3>Accesibilidad</h3>
+    <div class="acc-sub">Ajustes que se guardan en este dispositivo, pensados para acompañar los 8 diagnósticos que atendemos (visual, auditiva, intelectual, TDAH, dislexia, motriz, TEA, aptitudes sobresalientes).</div>
+    <div class="acc-row"><div class="acc-row-txt"><div class="acc-label">Texto grande</div><div class="acc-desc">Aumenta el tamaño de letras y botones — ideal para proyectar en pantallas grandes.</div></div><button class="acc-switch" id="swLarge" onclick="toggleA11y('large')"></button></div>
+    <div class="acc-row"><div class="acc-row-txt"><div class="acc-label">Alto contraste</div><div class="acc-desc">Colores más marcados para mejor visibilidad.</div></div><button class="acc-switch" id="swContrast" onclick="toggleA11y('contrast')"></button></div>
+    <div class="acc-row"><div class="acc-row-txt"><div class="acc-label">Modo de baja estimulación</div><div class="acc-desc">Quita decoraciones y animaciones — pensado para sensibilidad sensorial.</div></div><button class="acc-switch" id="swCalm" onclick="toggleA11y('calm')"></button></div>
+    <div class="acc-row"><div class="acc-row-txt"><div class="acc-label">Espaciado para dislexia</div><div class="acc-desc">Más espacio entre letras y una fuente distinta, más fácil de distinguir.</div></div><button class="acc-switch" id="swDyslexia" onclick="toggleA11y('dyslexia')"></button></div>
+    <div class="acc-row"><div class="acc-row-txt"><div class="acc-label">Modo simplificado</div><div class="acc-desc">Menos texto por pantalla — pensado para discapacidad intelectual.</div></div><button class="acc-switch" id="swSimple" onclick="toggleA11y('simple')"></button></div>
+    <button class="acc-close" onclick="closeAccPanel()">Cerrar</button>
+  </div>
+</div>
+
+<!-- VISTA DE MAESTRO (PIN) -->
+<div class="acc-overlay hidden" id="parentGateOverlay">
+  <div class="acc-panel">
+    <h3>Vista de maestro/a</h3>
+    <div class="acc-sub" id="parentGateSub">Ingresa el PIN para ver las respuestas clave de cada actividad.</div>
+    <input id="parentPinInput" type="tel" inputmode="numeric" maxlength="4" placeholder="••••" class="pin-input" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)">
+    <div class="pin-error" id="pinError"></div>
+    <button class="acc-close" onclick="submitParentPin()">Entrar</button>
+    <button class="acc-close" style="background:var(--parchment-dk);color:var(--ink);margin-top:10px" onclick="closeParentGate()">Cancelar</button>
+  </div>
+</div>
+
+<!-- PANEL DE MAESTRO (contenido tras PIN correcto) -->
+<div class="acc-overlay hidden" id="parentPanelOverlay">
+  <div class="acc-panel">
+    <h3>Panel de maestro/a</h3>
+    <div class="acc-sub">Respuestas clave y recordatorios — solo para ti, no se muestran a los alumnos.</div>
+    <div class="parent-item"><div class="pi-ico">🃏</div><div class="pi-txt"><b>Baraja numérica:</b> cada número se descompone en la suma de sus valores (ej. 3027 = 3000+20+7).</div></div>
+    <div class="parent-item"><div class="pi-ico">⚖️</div><div class="pi-txt"><b>Comparamos números:</b> ordena siempre comparando primero la cifra de mayor valor posicional.</div></div>
+    <div class="parent-item"><div class="pi-ico">📏</div><div class="pi-txt"><b>Mediciones:</b> 1/2+1/2=1 · 1/4+3/4=1 · 1/4+1/4=1/2 (no 3/4) · 1/2+1/4=3/4.</div></div>
+    <div class="parent-item"><div class="pi-ico">🍫</div><div class="pi-txt"><b>Repartos:</b> 1 chocolate ÷ 4 = 1/4 (menor que 1); 5 chocolates ÷ 4 = 1 + 1/4 (mayor que 1).</div></div>
+    <div class="parent-item"><div class="pi-ico">🟪</div><div class="pi-txt"><b>Fracciones:</b> cuenta las partes coloreadas sobre el total de partes iguales de la figura.</div></div>
+    <div class="parent-item"><div class="pi-ico">🔟</div><div class="pi-txt"><b>Décimos y centésimos:</b> un décimo = 10 centésimos; 0.5 &gt; 0.49 porque 50 centésimos &gt; 49 centésimos.</div></div>
+    <div class="parent-item"><div class="pi-ico">📶</div><div class="pi-txt">Recuerda: este juego funciona sin internet una vez cargado — ábrelo con wifi antes de ir a la escuela.</div></div>
+    <button class="acc-close" onclick="closeParentPanel()">Cerrar</button>
+  </div>
+</div>
+
+<script>
+const PARENT_PIN = '2026';
+
+// ---- Sonido (sintetizado, sin archivos de audio — funciona sin internet) ----
+let muted = (localStorage.getItem('md_muted') === '1');
+let audioCtx = null;
+function ensureAudio(){ if(!audioCtx){ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); } return audioCtx; }
+function beep(freq, dur, type, vol, delay){
+  if(muted) return;
+  try{
+    const ctx = ensureAudio();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type || 'sine'; o.frequency.value = freq;
+    o.connect(g); g.connect(ctx.destination);
+    const t = ctx.currentTime + (delay||0);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol||0.25, t+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t+(dur||0.15));
+    o.start(t); o.stop(t+(dur||0.15)+0.03);
+  }catch(e){}
+}
+function soundCorrect(){ beep(523.25,0.12,'triangle',0.28,0); beep(659.25,0.12,'triangle',0.28,0.1); beep(784,0.2,'triangle',0.28,0.2); confettiBurst(); }
+function soundWrong(){ beep(200,0.2,'sawtooth',0.18,0); }
+function soundClick(){ beep(700,0.05,'sine',0.12,0); }
+function toggleMute(){
+  muted = !muted;
+  localStorage.setItem('md_muted', muted ? '1':'0');
+  document.getElementById('soundBtn').textContent = muted ? '🔇' : '🔊';
+  if(!muted) beep(700,0.08,'sine',0.15,0);
+}
+(function(){ const b = document.getElementById('soundBtn'); if(b) b.textContent = muted ? '🔇' : '🔊'; })();
+
+// ---- Confeti (canvas, sin librerías externas) ----
+const confettiCanvas = document.getElementById('confettiCanvas');
+const cctx = confettiCanvas.getContext('2d');
+let confettiParticles = [];
+let confettiRunning = false;
+function resizeConfetti(){ confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight; }
+window.addEventListener('resize', resizeConfetti);
+resizeConfetti();
+const CONFETTI_COLORS = ['#F2762E','#F4B942','#3AAED8','#4E9A51','#E8604C','#1F4B3F'];
+function confettiBurst(){
+  const cx = window.innerWidth/2, cy = window.innerHeight*0.3;
+  for(let i=0;i<70;i++){
+    confettiParticles.push({
+      x: cx, y: cy,
+      vx: (Math.random()-0.5)*14,
+      vy: Math.random()*-10-4,
+      size: Math.random()*8+5,
+      color: CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)],
+      rot: Math.random()*360,
+      vr: (Math.random()-0.5)*18,
+      life: 0,
+    });
+  }
+  if(!confettiRunning){ confettiRunning = true; requestAnimationFrame(confettiStep); }
+}
+function confettiStep(){
+  cctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+  confettiParticles.forEach(p=>{
+    p.vy += 0.4; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life++;
+    cctx.save();
+    cctx.translate(p.x,p.y); cctx.rotate(p.rot*Math.PI/180);
+    cctx.fillStyle = p.color;
+    cctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.6);
+    cctx.restore();
+  });
+  confettiParticles = confettiParticles.filter(p=>p.life < 140 && p.y < confettiCanvas.height+40);
+  if(confettiParticles.length){ requestAnimationFrame(confettiStep); }
+  else { confettiRunning = false; cctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height); }
+}
+
+// ---- Marcador de equipos + CSV ----
+let scoreTeams = JSON.parse(localStorage.getItem('md_scoreTeams') || '[]');
+function saveScoreTeams(){ localStorage.setItem('md_scoreTeams', JSON.stringify(scoreTeams)); }
+function renderScoreList(){
+  const el = document.getElementById('scoreList');
+  const empty = document.getElementById('scoreEmpty');
+  el.innerHTML = '';
+  empty.style.display = scoreTeams.length ? 'none' : 'block';
+  scoreTeams.forEach((t,i)=>{
+    const row = document.createElement('div'); row.className = 'score-row';
+    row.innerHTML = `
+      <div class="sc-name">${t.name}</div>
+      <button class="sc-btn" onclick="addScorePoint(${i},-1)">−</button>
+      <div class="sc-pts">${t.pts}</div>
+      <button class="sc-btn plus" onclick="addScorePoint(${i},1)">+1</button>
+      <button class="sc-del" onclick="removeScoreTeam(${i})">🗑️</button>`;
+    el.appendChild(row);
+  });
+}
+function addScoreTeam(){
+  const input = document.getElementById('scNewName');
+  const name = input.value.trim();
+  if(!name) return;
+  scoreTeams.push({name, pts:0});
+  input.value = '';
+  saveScoreTeams(); renderScoreList(); soundClick();
+}
+function addScorePoint(i,delta){
+  scoreTeams[i].pts = Math.max(0, scoreTeams[i].pts + delta);
+  saveScoreTeams(); renderScoreList();
+  if(delta>0) soundCorrect(); else soundClick();
+}
+function removeScoreTeam(i){
+  scoreTeams.splice(i,1);
+  saveScoreTeams(); renderScoreList();
+}
+function exportScoreCSV(){
+  if(!scoreTeams.length){ alert('Agrega al menos un equipo antes de descargar.'); return; }
+  const fecha = new Date().toLocaleDateString('es-MX');
+  let csv = 'Equipo/Alumno,Puntos,Fecha\n';
+  scoreTeams.forEach(t=>{ csv += `"${t.name.replace(/"/g,'""')}",${t.pts},${fecha}\n`; });
+  const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'Avance_Piensa_Descubre_Aprende_'+fecha.replace(/\//g,'-')+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+renderScoreList();
+function openAccPanel(){ document.getElementById('accOverlay').classList.remove('hidden'); }
+function closeAccPanel(){ document.getElementById('accOverlay').classList.add('hidden'); }
+function toggleA11y(key){
+  const app = document.getElementById('app');
+  const cls = 'a11y-'+key;
+  const sw = document.getElementById('sw'+key.charAt(0).toUpperCase()+key.slice(1));
+  app.classList.toggle(cls);
+  sw.classList.toggle('on');
+}
+function openParentGate(){
+  document.getElementById('parentPinInput').value = '';
+  document.getElementById('pinError').textContent = '';
+  document.getElementById('parentGateOverlay').classList.remove('hidden');
+}
+function closeParentGate(){ document.getElementById('parentGateOverlay').classList.add('hidden'); }
+function submitParentPin(){
+  const val = document.getElementById('parentPinInput').value;
+  if(val === PARENT_PIN){
+    closeParentGate();
+    document.getElementById('parentPanelOverlay').classList.remove('hidden');
+  } else {
+    document.getElementById('pinError').textContent = 'PIN incorrecto. El PIN es ' + PARENT_PIN + ' (puedes cambiarlo en el código si lo compartes).';
+  }
+}
+function closeParentPanel(){ document.getElementById('parentPanelOverlay').classList.add('hidden'); }
+
+function go(id){
+  document.querySelectorAll('.screen.on').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0,0);
+  if(id==='s-map') refreshDoneBadges();
+}
+
+// ---- Avance por actividad: se marca "terminada" con 1 respuesta correcta ----
+// (no es examen con calificación — es para que sepas de un vistazo qué actividad ya practicó el grupo)
+let doneActivities = JSON.parse(localStorage.getItem('md_done') || '[]');
+function markDone(id){
+  if(!doneActivities.includes(id)){ doneActivities.push(id); localStorage.setItem('md_done', JSON.stringify(doneActivities)); }
+  refreshDoneBadges();
+}
+function refreshDoneBadges(){
+  for(let i=1;i<=6;i++){
+    const node = document.getElementById('node-a'+i);
+    if(node) node.classList.toggle('done', doneActivities.includes('a'+i));
+  }
+}
+refreshDoneBadges();
+
+// ---- Actividad 1: Baraja numérica ----
+const barajaBank = [
+  {n:'3027', ok:'3000 + 20 + 7', wrong:['3000 + 200 + 7','300 + 20 + 7']},
+  {n:'5416', ok:'5000 + 400 + 10 + 6', wrong:['5000 + 40 + 16','500 + 400 + 16']},
+  {n:'8090', ok:'8000 + 90', wrong:['8000 + 900','800 + 90']},
+  {n:'2708', ok:'2000 + 700 + 8', wrong:['2000 + 70 + 8','200 + 700 + 8']},
+];
+let barajaIdx = 0;
+function renderBaraja(){
+  const b = barajaBank[barajaIdx];
+  document.getElementById('barajaNum').textContent = b.n;
+  const opts = [b.ok, ...b.wrong].sort(()=>Math.random()-0.5);
+  const el = document.getElementById('barajaOpts');
+  el.innerHTML = '';
+  opts.forEach(o => {
+    const d = document.createElement('div');
+    d.className = 'opt'; d.textContent = o; d.style.fontSize='18px';
+    d.onclick = () => {
+      document.querySelectorAll('#barajaOpts .opt').forEach(x=>x.classList.remove('correct','wrong'));
+      if(o === b.ok){ d.classList.add('correct'); document.getElementById('barajaFeedback').textContent = '¡Correcto! '+b.n+' = '+b.ok; soundCorrect(); markDone('a1'); }
+      else { d.classList.add('wrong'); document.getElementById('barajaFeedback').textContent = 'Casi — inténtalo de nuevo.'; soundWrong(); }
+    };
+    el.appendChild(d);
+  });
+  document.getElementById('barajaFeedback').textContent = '';
+}
+function newBaraja(){ soundClick(); barajaIdx = (barajaIdx+1) % barajaBank.length; renderBaraja(); }
+renderBaraja();
+
+// ---- Actividad 2: Comparamos números ----
+const compBank = [[4821,1095,3760],[6204,6240,6024],[9981,999,9099],[2345,5432,3254]];
+let compIdx = 0;
+function renderComparamos(){
+  const nums = compBank[compIdx];
+  document.getElementById('compNums').innerHTML = nums.map(n=>`<div class="num-display">${n}</div>`).join('');
+  const correct = [...nums].sort((a,b)=>b-a).join(' > ');
+  const wrong1 = [...nums].sort((a,b)=>a-b).join(' > ');
+  const wrong2 = [nums[1],nums[0],nums[2]].join(' > ');
+  const opts = [correct, wrong1, wrong2].sort(()=>Math.random()-0.5);
+  const el = document.getElementById('compOpts');
+  el.innerHTML = '';
+  opts.forEach(o=>{
+    const d = document.createElement('div');
+    d.className='opt'; d.textContent=o; d.style.fontSize='17px';
+    d.onclick = () => {
+      document.querySelectorAll('#compOpts .opt').forEach(x=>x.classList.remove('correct','wrong'));
+      if(o===correct){ d.classList.add('correct'); document.getElementById('compFeedback').textContent='¡Correcto!'; soundCorrect(); markDone('a2'); }
+      else { d.classList.add('wrong'); document.getElementById('compFeedback').textContent='No es ese orden — intenta otra vez.'; soundWrong(); }
+    };
+    el.appendChild(d);
+  });
+  document.getElementById('compFeedback').textContent = '';
+}
+function newComparamos(){ soundClick(); compIdx=(compIdx+1)%compBank.length; renderComparamos(); }
+renderComparamos();
+
+// ---- Actividad 3: Mediciones ----
+const medBank = [
+  {eq:'1/2 m + 1/2 m = 1 m', ok:true},
+  {eq:'1/4 kg + 3/4 kg = 1 kg', ok:true},
+  {eq:'1/4 L + 1/4 L = 3/4 L', ok:false, fix:'1/4 L + 1/4 L = 1/2 L'},
+  {eq:'1/2 L + 1/4 L = 3/4 L', ok:true},
+];
+let medIdx = 0;
+function renderMed(){
+  const m = medBank[medIdx];
+  document.getElementById('medScene').textContent = m.eq;
+  const el = document.getElementById('medOpts');
+  el.innerHTML = '';
+  ['Correcta','Incorrecta'].forEach(label=>{
+    const d = document.createElement('div');
+    d.className='opt'; d.textContent=label;
+    d.onclick = () => {
+      document.querySelectorAll('#medOpts .opt').forEach(x=>x.classList.remove('correct','wrong'));
+      const isRight = (label==='Correcta') === m.ok;
+      d.classList.add(isRight ? 'correct' : 'wrong');
+      document.getElementById('medFeedback').textContent = m.ok ? '¡Es correcta!' : ('Es incorrecta — lo correcto es: '+m.fix);
+      if(isRight){ soundCorrect(); markDone('a3'); } else soundWrong();
+    };
+    el.appendChild(d);
+  });
+  document.getElementById('medFeedback').textContent = '';
+}
+function newMed(){ soundClick(); medIdx=(medIdx+1)%medBank.length; renderMed(); }
+renderMed();
+
+// ---- Actividad 4: Repartos ----
+const repBank = [
+  {q:'1 chocolate entre 4 personas. ¿A cuánto le toca a cada quien?', scene:'🍫🍫🍫🍫', ok:'1/4 (menor que 1)', wrong:['1 + 1/4','4']},
+  {q:'5 chocolates entre 4 personas. ¿A cuánto le toca a cada quien?', scene:'🍫🍫🍫🍫🍫', ok:'1 + 1/4 (mayor que 1)', wrong:['1/4','5/4 personas']},
+];
+let repIdx = 0;
+function renderRep(){
+  const r = repBank[repIdx];
+  document.getElementById('repPrompt').textContent = r.q;
+  document.querySelector('#a4 .scene').textContent = r.scene;
+  const opts = [r.ok, ...r.wrong].sort(()=>Math.random()-0.5);
+  const el = document.getElementById('repOpts');
+  el.innerHTML = '';
+  opts.forEach(o=>{
+    const d = document.createElement('div');
+    d.className='opt'; d.textContent=o; d.style.fontSize='18px';
+    d.onclick = () => {
+      document.querySelectorAll('#repOpts .opt').forEach(x=>x.classList.remove('correct','wrong'));
+      if(o===r.ok){ d.classList.add('correct'); document.getElementById('repFeedback').textContent='¡Correcto!'; soundCorrect(); markDone('a4'); }
+      else { d.classList.add('wrong'); document.getElementById('repFeedback').textContent='No es esa — intenta otra vez.'; soundWrong(); }
+    };
+    el.appendChild(d);
+  });
+  document.getElementById('repFeedback').textContent = '';
+}
+function newRep(){ soundClick(); repIdx=(repIdx+1)%repBank.length; renderRep(); }
+renderRep();
+
+// ---- Actividad 5: Fracciones ----
+function buildGrid(id, total, shaded, cls){
+  const el = document.getElementById(id);
+  el.innerHTML = '';
+  for(let i=0;i<total;i++){
+    const d = document.createElement('div');
+    d.className = 'frac-cell' + (shaded.includes(i) ? ' '+cls : '');
+    d.onclick = () => { d.classList.toggle(cls); soundClick(); markDone('a5'); };
+    el.appendChild(d);
+  }
+}
+buildGrid('fracRosa', 12, [0,1,4,5,8,9], 'on');
+buildGrid('fracAzul', 4, [0], 'blue');
+
+function buildFracAnswer(optsId, feedbackId, correctIsSi, explainSi, explainNo){
+  const el = document.getElementById(optsId);
+  const fb = document.getElementById(feedbackId);
+  el.innerHTML = '';
+  ['Sí','No'].forEach(label=>{
+    const d = document.createElement('div');
+    d.className = 'opt'; d.textContent = label;
+    d.onclick = () => {
+      document.querySelectorAll('#'+optsId+' .opt').forEach(x=>x.classList.remove('correct','wrong'));
+      const isRight = (label==='Sí') === correctIsSi;
+      d.classList.add(isRight ? 'correct' : 'wrong');
+      fb.textContent = correctIsSi ? explainSi : explainNo;
+      if(isRight){ soundCorrect(); markDone('a5'); } else soundWrong();
+    };
+    el.appendChild(d);
+  });
+}
+buildFracAnswer('rosaOpts','rosaFeedback', true, '¡Correcto! 6 de 12 cuadritos coloreados = la mitad = 1/2.', 'Cuenta: 6 de 12 cuadritos están coloreados — eso es la mitad, o sea sí es 1/2.');
+buildFracAnswer('azulOpts','azulFeedback', true, '¡Correcto! 1 de 4 cuadritos coloreados = 1/4.', 'Cuenta: 1 de 4 cuadritos está coloreado — eso sí es 1/4.');
+
+// ---- Actividad 6a: grid 100 ----
+(function(){
+  const grid = document.getElementById('grid100');
+  const label = document.getElementById('gridLabel');
+  for(let i=0;i<100;i++){
+    const c = document.createElement('div');
+    c.className='cell100';
+    c.onclick = () => {
+      c.classList.toggle('on');
+      soundClick();
+      const count = grid.querySelectorAll('.cell100.on').length;
+      label.textContent = `${count} celdas = ${(count/100).toFixed(2)} = ${Math.floor(count/10)} décimo(s) y ${count%10} centésimo(s)`;
+      if(count===100){ confettiBurst(); markDone('a6'); }
+    };
+    grid.appendChild(c);
+  }
+})();
+
+// ---- Actividad 6b: Tripas de gato ----
+const gatoPairs = [ {l:'16.08',r:'16 + 8/100'}, {l:'23.59',r:'20 + 3 + 5/10 + 9/100'}, {l:'0.5',r:'5/10'}, {l:'7.4',r:'7 + 4/10'} ];
+function renderGato(){
+  const rights = gatoPairs.map((p,i)=>({...p,idx:i}));
+  for(let i=rights.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [rights[i],rights[j]]=[rights[j],rights[i]]; }
+  const board = document.getElementById('gatoBoard');
+  board.innerHTML = '';
+  let selected = null;
+  gatoPairs.forEach((p,i)=>{
+    const row = document.createElement('div'); row.className='match-row';
+    const l = document.createElement('div'); l.className='match-card left'; l.textContent=p.l; l.dataset.idx=i;
+    const rp = rights[i];
+    const r = document.createElement('div'); r.className='match-card right'; r.textContent=rp.r; r.dataset.idx=rp.idx;
+    l.onclick = () => { if(l.classList.contains('matched')) return; document.querySelectorAll('.match-card.left').forEach(x=>x.style.outline=''); l.style.outline='4px solid '+'#F4B942'; selected=l; };
+    r.onclick = () => { if(r.classList.contains('matched') || !selected) return;
+      if(selected.dataset.idx===r.dataset.idx){
+        selected.classList.add('matched'); r.classList.add('matched'); selected.style.outline=''; selected=null;
+        soundCorrect();
+        if(board.querySelectorAll('.match-card.matched').length === gatoPairs.length*2){ setTimeout(confettiBurst,150); markDone('a6'); }
+      }
+      else { r.style.filter='brightness(0.7)'; setTimeout(()=>r.style.filter='',350); soundWrong(); } };
+    row.appendChild(l); row.appendChild(r); board.appendChild(row);
+  });
+  const btn = document.createElement('button'); btn.className='next-btn gold'; btn.textContent='🔀 Reiniciar'; btn.onclick=renderGato;
+  board.appendChild(btn);
+}
+renderGato();
+
+// ---- Actividad 6c: ¿Quién tiene la explicación? ----
+const quienBank = [
+  {q:'¿Qué tira será más larga, la que mide 5/4 metros o la que mide 7/4 metros?', a:'La de 7/4 m — tiene más cuartos que la de 5/4 m.'},
+  {q:'Vanesa recibe 3/4 de barra de chocolate y Diego recibe 3/8 de barra. ¿A quién le tocó mayor cantidad?', a:'A Vanesa — 3/4 equivale a 6/8, que es más que 3/8.'},
+  {q:'Las piñas pesan 1 kg y 4/10 de kg. ¿Esto es más o menos que 1.5 kg?', a:'Es menos — 1.4 kg es menor que 1.5 kg.'},
+];
+const qb = document.getElementById('quienBoard');
+qb.innerHTML = quienBank.map((q,i)=>`<div class="opt" style="display:block;text-align:left;font-size:17px;margin-bottom:12px;cursor:pointer" onclick="document.getElementById('qa${i}').classList.toggle('hidden')">${q.q}<div class="feedback hidden" id="qa${i}" style="text-align:left;color:var(--leaf-dk)">${q.a}</div></div>`).join('');
+</script>
+</body>
+</html>
