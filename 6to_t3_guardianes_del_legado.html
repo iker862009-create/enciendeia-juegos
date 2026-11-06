@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Guardianes del Legado — El Legado que Dejamos Eres Tú · 6° grado T3</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@600;700;800&display=swap');
+:root{
+  --brand:#00B4D8; --brand-dark:#0086A8; --parchment:#FBF3E1; --parchment-dk:#F3E6C8;
+  --gold:#F4A100; --gold-dk:#C6830A; --leaf:#4E9A51; --leaf-dk:#357238;
+  --coral:#E8604C; --ink:#1A1A1A; --ink-soft:#5B5B5B;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{ margin:0; min-height:100vh; font-family:'Nunito',sans-serif; color:var(--ink);
+  background: radial-gradient(circle at 12% 8%, rgba(244,161,0,.14), transparent 40%),
+    radial-gradient(circle at 90% 85%, rgba(0,180,216,.14), transparent 45%), var(--parchment);
+  display:flex; justify-content:center; align-items:flex-start; }
+.app{ width:100%; max-width:900px; min-height:100vh; position:relative; padding-bottom:40px; }
+h1,h2,h3{ font-family:'Baloo 2',sans-serif; margin:0; }
+.screen{ display:none; flex-direction:column; animation:fade .25s ease; }
+.screen.on{ display:flex; }
+@keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+button{ font-family:'Baloo 2',sans-serif; cursor:pointer; border:none; }
+.brand-bar{ background:linear-gradient(160deg,var(--brand),var(--brand-dark)); padding:30px 36px 36px; border-radius:0 0 36px 36px; position:relative; overflow:hidden; }
+.brand-bar::after{ content:''; position:absolute; left:0; right:0; bottom:-2px; height:16px; background:repeating-linear-gradient(115deg,var(--gold) 0 20px, var(--gold-dk) 20px 40px); opacity:.5; }
+.brand-row{ display:flex; align-items:center; gap:16px; }
+#s-map .brand-row{ margin-top:46px; }
+.brand-logo{ width:64px; height:64px; border-radius:18px; background:rgba(255,255,255,.16); display:flex; align-items:center; justify-content:center; font-size:34px; border:1px solid rgba(255,255,255,.3); flex-shrink:0; }
+.brand-name{ color:#fff; font-weight:800; font-size:24px; letter-spacing:-.2px; line-height:1.15; }
+.brand-tag{ color:#D9F2FA; font-size:15px; font-weight:700; margin-top:2px; }
+.back-btn{ width:48px; height:48px; border-radius:14px; background:var(--parchment-dk); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; position:absolute; top:28px; left:28px; }
+.acc-btn{ position:absolute; top:28px; right:28px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); border-radius:50%; width:50px; height:50px; font-size:22px; color:#fff; }
+.parent-btn{ position:absolute; top:28px; right:90px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); border-radius:50%; width:50px; height:50px; font-size:22px; color:#fff; }
+.sound-btn{ position:absolute; top:28px; right:152px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); border-radius:50%; width:50px; height:50px; font-size:22px; color:#fff; }
+.acc-overlay, .parent-overlay{ position:fixed; inset:0; background:rgba(26,26,26,.55); display:flex; align-items:flex-end; justify-content:center; z-index:500; }
+.acc-overlay.hidden, .parent-overlay.hidden{ display:none; }
+.acc-panel, .parent-panel{ width:100%; max-width:900px; background:var(--parchment); border-radius:30px 30px 0 0; padding:30px 36px 36px; max-height:86vh; overflow:auto; }
+.acc-panel h3, .parent-panel h3{ font-size:24px; color:var(--brand-dark); margin-bottom:4px; }
+.acc-sub{ font-size:15px; color:var(--ink-soft); margin-bottom:20px; line-height:1.4; }
+.acc-row{ display:flex; align-items:center; justify-content:space-between; gap:16px; background:#fff; border-radius:18px; padding:18px 20px; margin-bottom:12px; }
+.acc-row-txt .acc-label{ font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; color:var(--ink); }
+.acc-row-txt .acc-desc{ font-size:14px; color:var(--ink-soft); margin-top:2px; }
+.acc-switch{ width:58px; height:34px; border-radius:999px; background:var(--parchment-dk); position:relative; flex-shrink:0; border:none; }
+.acc-switch::after{ content:''; position:absolute; top:3px; left:3px; width:28px; height:28px; border-radius:50%; background:#fff; transition:.15s; box-shadow:0 1px 3px rgba(0,0,0,.25); }
+.acc-switch.on{ background:var(--leaf); }
+.acc-switch.on::after{ left:27px; }
+.acc-close, .parent-close{ width:100%; margin-top:8px; padding:18px; background:var(--brand-dark); color:#fff; border-radius:999px; font-weight:800; font-size:18px; }
+.app.a11y-large .prompt{ font-size:26px; }
+.app.a11y-large .opt{ font-size:24px; padding:22px 10px; }
+.app.a11y-large .brand-name{ font-size:28px; }
+.app.a11y-contrast{ --parchment:#FFFFFF; --parchment-dk:#E4E4E4; --ink:#000000; --ink-soft:#222222; }
+.app.a11y-contrast .opt{ border-width:5px; }
+.app.a11y-contrast .opt.correct{ background:#CDEFCD; border-color:#0B6B0B; }
+.app.a11y-contrast .opt.wrong{ background:#FBD3CC; border-color:#B32D18; }
+.app.a11y-dyslexia, .app.a11y-dyslexia .prompt, .app.a11y-dyslexia .opt{ letter-spacing:0.06em; word-spacing:0.18em; line-height:1.7; }
+.app.a11y-dyslexia .prompt{ font-family:'Comic Sans MS','Baloo 2',sans-serif; }
+.app.a11y-calm .zone-deco{ display:none; }
+.app.a11y-simple .node-label{ display:none; }
+#confettiCanvas{ position:fixed; inset:0; pointer-events:none; z-index:900; }
+.student-badge{ display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.3); border-radius:999px; padding:10px 18px; margin:18px 36px 0; color:#fff; font-weight:700; }
+.student-badge .sb-name{ flex:1; font-size:16px; }
+.student-badge button{ background:rgba(255,255,255,.22); color:#fff; border-radius:999px; padding:8px 14px; font-size:13px; font-weight:800; }
+.name-input, .pin-input{ border:3px solid var(--parchment-dk); border-radius:14px; padding:16px 18px; font-size:18px; font-family:'Nunito',sans-serif; width:100%; margin-bottom:16px; }
+.pin-input{ font-family:'Baloo 2',sans-serif; font-weight:800; font-size:34px; letter-spacing:16px; text-align:center; border:none; border-bottom:4px dotted var(--gold-dk); background:transparent; color:var(--ink); }
+.pin-input:focus{ outline:none; }
+.pin-error{ color:var(--coral); font-weight:800; font-size:14px; text-align:center; min-height:18px; margin-top:-12px; margin-bottom:8px; }
+.map-scroll{ padding:34px 36px 20px; display:flex; flex-direction:column; align-items:center; gap:0; position:relative; }
+.zone-deco{ position:absolute; font-size:50px; opacity:.14; z-index:0; pointer-events:none; }
+.vine{ width:6px; height:46px; background:repeating-linear-gradient(var(--leaf) 0 8px, transparent 8px 15px); border-radius:3px; position:relative; z-index:1; }
+.leaf-node{ width:120px; height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; z-index:1; cursor:pointer; border-radius:63% 37% 54% 46% / 55% 45% 42% 58%; border:4px solid transparent; transition:.15s; background:#fff; box-shadow:0 4px 14px rgba(0,134,168,.14); }
+.leaf-node:active{ transform:scale(.95); }
+.leaf-node .le{ font-size:40px; }
+.leaf-node .ln{ font-size:13px; font-weight:800; margin-top:3px; color:var(--ink); text-align:center; max-width:96px; line-height:1.15; }
+.leaf-node.gold{ background:var(--gold); border-color:var(--gold-dk); }
+.leaf-node.done{ border-color:var(--leaf); }
+.leaf-node.done::before{ content:'✔'; position:absolute; top:-6px; right:-6px; background:var(--leaf); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; box-shadow:0 2px 6px rgba(0,0,0,.2); }
+.quest-body{ padding:30px 36px; }
+.q-title{ font-size:22px; font-weight:800; color:var(--brand-dark); margin-bottom:6px; }
+.q-personaje{ font-size:15px; color:var(--ink-soft); font-weight:700; margin-bottom:18px; }
+.q-card{ background:#fff; border-radius:22px; padding:22px 24px; box-shadow:0 4px 14px rgba(0,0,0,.08); margin-bottom:20px; }
+.q-card .campo-tag{ display:inline-block; background:var(--parchment-dk); color:var(--brand-dark); font-weight:800; font-size:12px; padding:5px 12px; border-radius:999px; margin-bottom:10px; }
+.prompt{ font-size:19px; font-weight:700; line-height:1.4; color:var(--ink); }
+.puzzle-label{ font-size:15px; color:var(--ink-soft); font-weight:700; margin:22px 0 10px; }
+.opt{ display:block; width:100%; text-align:left; background:#fff; border:3px solid var(--parchment-dk); border-radius:16px; padding:18px 20px; margin-bottom:12px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; color:var(--ink); letter-spacing:.05em; }
+.opt.correct{ background:#E8F6E9; border-color:var(--leaf); }
+.opt.wrong{ background:#FCEAE6; border-color:var(--coral); }
+.feedback{ text-align:center; font-weight:800; font-size:17px; min-height:24px; margin:6px 0 14px; }
+.feedback.ok{ color:var(--leaf-dk); }
+.feedback.bad{ color:var(--coral); }
+.next-btn{ width:100%; padding:18px; background:var(--leaf); color:#fff; border-radius:999px; font-weight:800; font-size:18px; display:none; }
+.next-btn.show{ display:block; }
+.final-box{ padding:40px 36px; text-align:center; }
+.final-emoji{ font-size:64px; margin-bottom:12px; }
+.secret-phrase{ font-family:'Baloo 2',sans-serif; font-weight:800; font-size:26px; color:var(--gold-dk); background:var(--parchment-dk); border-radius:18px; padding:20px; margin:18px 0; letter-spacing:.04em; line-height:1.4; }
+.parent-table{ width:100%; border-collapse:collapse; font-size:14px; margin-top:12px; }
+.parent-table th, .parent-table td{ border:1px solid var(--parchment-dk); padding:8px; text-align:center; }
+.parent-table th{ background:var(--parchment-dk); font-family:'Baloo 2',sans-serif; }
+.csv-btn{ width:100%; margin-top:14px; padding:16px; background:var(--gold); color:#fff; border-radius:999px; font-weight:800; font-size:16px; }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+<!-- MAPA -->
+<div class="screen on" id="s-map">
+  <div class="brand-bar">
+    <button class="acc-btn" id="soundBtn" onclick="toggleMute()">🔊</button>
+    <button class="parent-btn" onclick="openParentGate()">👨‍🏫</button>
+    <button class="acc-btn" style="right:28px" onclick="openAccPanel()">♿</button>
+    <div class="brand-row">
+      <div class="brand-logo">🗝️</div>
+      <div>
+        <div class="brand-name">Guardianes del Legado</div>
+        <div class="brand-tag">El Legado que Dejamos Eres Tú · 6° grado T3</div>
+      </div>
+    </div>
+    <div class="student-badge">
+      <div class="sb-name" id="sbName"></div>
+      <button onclick="openStudentPrompt()">Cambiar</button>
+    </div>
+  </div>
+  <div class="map-scroll" id="mapScroll"></div>
+</div>
+
+<!-- PANTALLA DE MISIÓN (dinámica) -->
+<div class="screen" id="s-quest">
+  <div class="brand-bar">
+    <button class="back-btn" onclick="go('s-map')">←</button>
+  </div>
+  <div class="quest-body" id="questBody"></div>
+</div>
+
+<!-- PANTALLA FINAL -->
+<div class="screen" id="s-final">
+  <div class="brand-bar">
+    <button class="back-btn" onclick="go('s-map')">←</button>
+  </div>
+  <div class="final-box">
+    <div class="final-emoji">🗝️</div>
+    <h2>¡Frase secreta completa!</h2>
+    <div class="secret-phrase">EL LEGADO QUE DEJAMOS ERES TÚ</div>
+    <p style="color:var(--ink-soft)">Completaste los 6 retos de El Legado que Dejamos Eres Tú. ¡Muy bien, Guardián!</p>
+  </div>
+</div>
+
+<!-- MODAL NOMBRE ALUMNO -->
+<div class="acc-overlay hidden" id="studentGate">
+  <div class="acc-panel">
+    <h3>¿Quién va a jugar?</h3>
+    <div class="acc-sub">Escribe tu nombre para guardar tu progreso en este dispositivo.</div>
+    <input type="text" class="name-input" id="studentNameInput" placeholder="Tu nombre">
+    <button class="acc-close" onclick="submitStudentName()">Guardar y continuar</button>
+  </div>
+</div>
+
+<!-- PANEL ACCESIBILIDAD -->
+<div class="acc-overlay hidden" id="accOverlay">
+  <div class="acc-panel">
+    <h3>Accesibilidad</h3>
+    <div class="acc-sub">Ajusta el juego a lo que te sea más cómodo.</div>
+    <div class="acc-row"><div class="acc-row-txt"><div class="acc-label">Texto grande</div><div class="acc-desc">Letras y botones más grandes</div></div><button class="acc-switch" id="swLarge" onclick="toggleA11y('large')"></button></div>
+    <div class="acc-row"><div class="acc-row-txt"><div class="acc-label">Alto contraste</div><div class="acc-desc">Colores más marcados</div></div><button class="acc-switch" id="swContrast" onclick="toggleA11y('contrast')"></button></div>
+    <div class="acc-row"><div class="acc-row-txt"><div class="acc-label">Modo calma</div><div class="acc-desc">Menos decoraciones en el mapa</div></div><button class="acc-switch" id="swCalm" onclick="toggleA11y('calm')"></button></div>
+    <div class="acc-row"><div class="acc-row-txt"><div class="acc-label">Espaciado disléxico</div><div class="acc-desc">Más espacio entre letras</div></div><button class="acc-switch" id="swDyslexia" onclick="toggleA11y('dyslexia')"></button></div>
+    <div class="acc-row"><div class="acc-row-txt"><div class="acc-label">Modo simplificado</div><div class="acc-desc">Oculta etiquetas de nodos</div></div><button class="acc-switch" id="swSimple" onclick="toggleA11y('simple')"></button></div>
+    <button class="acc-close" onclick="closeAccPanel()">Cerrar</button>
+  </div>
+</div>
+
+<!-- GATE PIN MAESTRO/PADRE -->
+<div class="acc-overlay hidden" id="parentGate">
+  <div class="acc-panel">
+    <h3>Vista de maestro/a o familia</h3>
+    <div class="acc-sub">Ingresa el PIN para ver el avance de cada alumno.</div>
+    <input type="password" inputmode="numeric" maxlength="4" class="pin-input" id="pinInput" placeholder="••••">
+    <div class="pin-error" id="pinError"></div>
+    <button class="acc-close" onclick="submitParentPin()">Entrar</button>
+    <button class="acc-close" style="background:var(--parchment-dk);color:var(--ink);margin-top:8px" onclick="closeParentGate()">Cancelar</button>
+  </div>
+</div>
+
+<!-- PANEL PADRE/MAESTRO -->
+<div class="parent-overlay hidden" id="parentPanel">
+  <div class="parent-panel">
+    <h3>Avance de alumnos</h3>
+    <div class="acc-sub">El Legado que Dejamos Eres Tú · 6° grado T3</div>
+    <div id="parentTableWrap"></div>
+    <button class="csv-btn" onclick="exportCSV()">Exportar CSV</button>
+    <button class="parent-close" onclick="closeParentPanel()">Cerrar</button>
+  </div>
+</div>
+
+<canvas id="confettiCanvas"></canvas>
+</div>
+
+<script>
+const LS = "g6t3";
+const PARENT_PIN = "2026";
+const NODOS = [{"id": "n1", "num": 1, "titulo": "Debates breves, pero profundos", "personaje": "Mateo", "pregunta": "¿Cómo defendemos una idea con argumentos sólidos, sin dejar de escuchar a quien piensa distinto?", "campo": "Lenguajes", "palabra": "EL", "opciones": ["LE", "EL", "LE2"]}, {"id": "n2", "num": 2, "titulo": "Nuestros vecinos estelares", "personaje": "Valeria", "pregunta": "¿Qué hay más allá de nuestro Sistema Solar, y cómo lo hemos llegado a conocer?", "campo": "Saberes y Pensamiento Científico", "palabra": "LEGADO", "opciones": ["DOGALE", "LEGADO", "GLODEA"]}, {"id": "n3", "num": 3, "titulo": "Mosaicos de biodiversidad: el desafío de la simetría", "personaje": "Emilio", "pregunta": "¿Cómo podemos representar la biodiversidad de nuestra comunidad usando la simetría?", "campo": "Saberes y Pensamiento Científico", "palabra": "QUE", "opciones": ["QEU", "QUE", "EQU"]}, {"id": "n4", "num": 4, "titulo": "Manifiesto a favor de los derechos de la niñez", "personaje": "Renata", "pregunta": "¿Cómo podemos dar a conocer, con nuestras propias palabras, el derecho de niñas, niños y adolescentes a estar protegidos?", "campo": "Ética, Naturaleza y Sociedades", "palabra": "DEJAMOS", "opciones": ["DEJAMOS", "DMEAOSJ", "MSOJADE"]}, {"id": "n5", "num": 5, "titulo": "¡Está en nuestras manos!", "personaje": "Camila", "pregunta": "¿Qué podemos hacer, como grupo, ante un caso real de discriminación o violencia en nuestra comunidad?", "campo": "De lo Humano y lo Comunitario", "palabra": "ERES", "opciones": ["EERS", "ESRE", "ERES"]}, {"id": "n6", "num": 6, "titulo": "Piénsalo la próxima vez", "personaje": "Diego", "pregunta": "¿Cómo podemos resolver un conflicto sin violencia, construyendo una cultura de paz en nuestra escuela?", "campo": "De lo Humano y lo Comunitario", "palabra": "TÚ", "opciones": ["TÚ", "ÚT2", "ÚT"]}];
+const FRASE_SECRETA = "EL LEGADO QUE DEJAMOS ERES TÚ";
+
+let muted = localStorage.getItem(LS+"_muted") === "1";
+let audioCtx = null;
+function ensureAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
+function beep(freq, dur, type, vol, delay){
+  if(muted) return;
+  try{
+    const ctx = ensureAudio();
+    const osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.type = type||"sine"; osc.frequency.value = freq;
+    osc.connect(gain); gain.connect(ctx.destination);
+    const t0 = ctx.currentTime + (delay||0);
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.linearRampToValueAtTime(vol||0.25, t0+0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0+(dur||0.15));
+    osc.start(t0); osc.stop(t0+(dur||0.15)+0.03);
+  }catch(e){}
+}
+function soundCorrect(){ beep(523.25,0.12,"sine",0.28,0); beep(659.25,0.12,"sine",0.28,0.1); beep(784,0.2,"sine",0.28,0.2); confettiBurst(); }
+function soundWrong(){ beep(200,0.2,"sawtooth",0.18,0); }
+function soundClick(){ beep(700,0.05,"sine",0.12,0); }
+function toggleMute(){ muted=!muted; localStorage.setItem(LS+"_muted", muted?"1":"0"); document.getElementById("soundBtn").textContent = muted?"🔇":"🔊"; if(!muted) beep(700,0.08,"sine",0.15,0); }
+(function(){ const b=document.getElementById("soundBtn"); if(b) b.textContent = muted?"🔇":"🔊"; })();
+
+const confettiCanvas = document.getElementById("confettiCanvas"), cctx = confettiCanvas.getContext("2d");
+let confettiParticles = [], confettiRunning = false;
+function resizeConfetti(){ confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight; }
+window.addEventListener("resize", resizeConfetti); resizeConfetti();
+const CONFETTI_COLORS = ["#00B4D8","#F4A100","#4E9A51","#E8604C","#ffffff"];
+function confettiBurst(){
+  const cx = window.innerWidth/2, cy = window.innerHeight*0.3;
+  for(let i=0;i<70;i++){
+    confettiParticles.push({x:cx,y:cy,vx:(Math.random()-0.5)*14,vy:Math.random()*-10-4,
+      size:Math.random()*8+5,color:CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)],
+      rot:Math.random()*360,vr:(Math.random()-0.5)*18,life:0});
+  }
+  if(!confettiRunning){ confettiRunning=true; requestAnimationFrame(confettiStep); }
+}
+function confettiStep(){
+  cctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+  confettiParticles.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy; p.vy+=0.4; p.rot+=p.vr; p.life++;
+    cctx.save(); cctx.translate(p.x,p.y); cctx.rotate(p.rot*Math.PI/180);
+    cctx.fillStyle=p.color; cctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.6);
+    cctx.restore();
+  });
+  confettiParticles = confettiParticles.filter(p=>p.life<140 && p.y<confettiCanvas.height+40);
+  if(confettiParticles.length) requestAnimationFrame(confettiStep);
+  else { confettiRunning=false; cctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height); }
+}
+
+// accesibilidad
+["large","contrast","calm","dyslexia","simple"].forEach(k=>{
+  if(localStorage.getItem(LS+"_a11y_"+k)==="1"){
+    document.getElementById("app").classList.add("a11y-"+k);
+    const sw = document.getElementById("sw"+k.charAt(0).toUpperCase()+k.slice(1));
+    if(sw) sw.classList.add("on");
+  }
+});
+function openAccPanel(){ document.getElementById("accOverlay").classList.remove("hidden"); }
+function closeAccPanel(){ document.getElementById("accOverlay").classList.add("hidden"); }
+function toggleA11y(k){
+  const app = document.getElementById("app");
+  const on = app.classList.toggle("a11y-"+k);
+  const sw = document.getElementById("sw"+k.charAt(0).toUpperCase()+k.slice(1));
+  sw.classList.toggle("on", on);
+  localStorage.setItem(LS+"_a11y_"+k, on?"1":"0");
+}
+
+// alumno + progreso
+let students = JSON.parse(localStorage.getItem(LS+"_students")||"{}");
+let currentStudent = localStorage.getItem(LS+"_current")||"";
+function saveStudents(){ localStorage.setItem(LS+"_students", JSON.stringify(students)); }
+function ensureStudentRecord(name){
+  if(!students[name]) students[name]={};
+  NODOS.forEach(n=>{ if(!students[name][n.id]) students[name][n.id]={attempts:0,correct:false}; });
+}
+function renderStudentBadge(){ document.getElementById("sbName").textContent = currentStudent?currentStudent:"Sin alumno — toca \"Cambiar\""; }
+function openStudentPrompt(){ document.getElementById("studentNameInput").value=currentStudent||""; document.getElementById("studentGate").classList.remove("hidden"); }
+function submitStudentName(){
+  const v = document.getElementById("studentNameInput").value.trim();
+  if(!v) return;
+  currentStudent=v; localStorage.setItem(LS+"_current", v);
+  ensureStudentRecord(v); saveStudents();
+  document.getElementById("studentGate").classList.add("hidden");
+  renderStudentBadge(); renderMap(); soundClick();
+}
+if(currentStudent) ensureStudentRecord(currentStudent);
+renderStudentBadge();
+
+function go(id){ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on")); document.getElementById(id).classList.add("on"); window.scrollTo(0,0); }
+
+function renderMap(){
+  const wrap = document.getElementById("mapScroll");
+  wrap.innerHTML = "";
+  NODOS.forEach((n,i)=>{
+    if(i>0){ const v=document.createElement("div"); v.className="vine"; wrap.appendChild(v); }
+    const done = currentStudent && students[currentStudent] && students[currentStudent][n.id] && students[currentStudent][n.id].correct;
+    const btn = document.createElement("div");
+    btn.className = "leaf-node"+(done?" done":"");
+    btn.id = "node-"+n.id;
+    btn.innerHTML = '<div class="le">🍃</div><div class="ln node-label">'+n.num+'. '+n.titulo+'</div>';
+    btn.onclick = ()=>openNode(n.id);
+    wrap.appendChild(btn);
+  });
+  const v=document.createElement("div"); v.className="vine"; wrap.appendChild(v);
+  const allDone = currentStudent && NODOS.every(n=>students[currentStudent] && students[currentStudent][n.id] && students[currentStudent][n.id].correct);
+  const finalBtn = document.createElement("div");
+  finalBtn.className = "leaf-node gold"+(allDone?" done":"");
+  finalBtn.innerHTML = '<div class="le">🗝️</div><div class="ln node-label">Frase secreta</div>';
+  finalBtn.onclick = ()=>{ if(allDone) go("s-final"); else alert("Completa los 6 retos para desbloquear la frase secreta."); };
+  wrap.appendChild(finalBtn);
+}
+renderMap();
+
+let activeNode = null;
+function openNode(id){
+  if(!currentStudent){ openStudentPrompt(); return; }
+  activeNode = NODOS.find(n=>n.id===id);
+  const body = document.getElementById("questBody");
+  body.innerHTML =
+    '<div class="q-title">'+activeNode.num+'. '+activeNode.titulo+'</div>' +
+    '<div class="q-personaje">'+activeNode.personaje+' te reta a resolver esta misión</div>' +
+    '<div class="q-card"><div class="campo-tag">'+(activeNode.campo||"")+'</div><div class="prompt">'+(activeNode.pregunta||"")+'</div></div>' +
+    '<div class="puzzle-label">🔑 Encuentra la palabra secreta de este proyecto:</div>' +
+    '<div id="optsWrap"></div>' +
+    '<div class="feedback" id="feedback"></div>' +
+    '<button class="next-btn" id="nextBtn" onclick="go(\'s-map\')">Volver al mapa</button>';
+  const ow = document.getElementById("optsWrap");
+  activeNode.opciones.forEach(opt=>{
+    const b = document.createElement("button");
+    b.className = "opt"; b.textContent = opt;
+    b.onclick = ()=>answerNode(opt, b);
+    ow.appendChild(b);
+  });
+  go("s-quest");
+}
+function answerNode(opt, btnEl){
+  ensureStudentRecord(currentStudent);
+  const rec = students[currentStudent][activeNode.id];
+  rec.attempts++;
+  const ok = opt.toUpperCase() === activeNode.palabra.toUpperCase();
+  document.querySelectorAll("#optsWrap .opt").forEach(b=>b.disabled=true);
+  const fb = document.getElementById("feedback");
+  if(ok){
+    rec.correct = true;
+    btnEl.classList.add("correct");
+    fb.textContent = "¡Correcto! Palabra secreta: "+activeNode.palabra;
+    fb.className = "feedback ok";
+    soundCorrect();
+  } else {
+    btnEl.classList.add("wrong");
+    document.querySelectorAll("#optsWrap .opt").forEach(b=>{ if(b.textContent.toUpperCase()===activeNode.palabra.toUpperCase()) b.classList.add("correct"); });
+    fb.textContent = "Casi — la palabra correcta era: "+activeNode.palabra;
+    fb.className = "feedback bad";
+    soundWrong();
+  }
+  saveStudents();
+  document.getElementById("nextBtn").classList.add("show");
+  renderMap();
+}
+
+// vista maestro/padre
+function openParentGate(){ document.getElementById("pinInput").value=""; document.getElementById("pinError").textContent=""; document.getElementById("parentGate").classList.remove("hidden"); }
+function closeParentGate(){ document.getElementById("parentGate").classList.add("hidden"); }
+function submitParentPin(){
+  const v = document.getElementById("pinInput").value;
+  if(v===PARENT_PIN){ closeParentGate(); renderParentPanel(); document.getElementById("parentPanel").classList.remove("hidden"); }
+  else { document.getElementById("pinError").textContent = "PIN incorrecto."; }
+}
+function closeParentPanel(){ document.getElementById("parentPanel").classList.add("hidden"); }
+function renderParentPanel(){
+  const names = Object.keys(students);
+  const wrap = document.getElementById("parentTableWrap");
+  if(!names.length){ wrap.innerHTML = "<p>Todavía no hay alumnos registrados en este dispositivo.</p>"; return; }
+  let h = '<table class="parent-table"><tr><th>Alumno</th>';
+  NODOS.forEach(n=>h+='<th>P'+n.num+'</th>');
+  h += '<th>Frase completa</th></tr>';
+  names.forEach(name=>{
+    h += '<tr><td>'+name+'</td>';
+    let allOk = true;
+    NODOS.forEach(n=>{
+      const r = students[name][n.id]||{attempts:0,correct:false};
+      if(!r.correct) allOk=false;
+      h += '<td>'+(r.correct?'✔':'—')+' ('+r.attempts+')</td>';
+    });
+    h += '<td>'+(allOk?'✔':'—')+'</td></tr>';
+  });
+  h += '</table>';
+  wrap.innerHTML = h;
+}
+function exportCSV(){
+  let rows = [["Alumno", ...NODOS.map(n=>"Proyecto "+n.num), "Frase completa"]];
+  Object.keys(students).forEach(name=>{
+    let allOk = true;
+    const row = [name];
+    NODOS.forEach(n=>{ const r=students[name][n.id]||{attempts:0,correct:false}; if(!r.correct) allOk=false; row.push(r.correct?"Sí ("+r.attempts+" intentos)":"No ("+r.attempts+" intentos)"); });
+    row.push(allOk?"Sí":"No");
+    rows.push(row);
+  });
+  const csv = rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(",")).join("\n");
+  const blob = new Blob(["\ufeff"+csv], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "g6t3_avance.csv";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+</script>
+</body></html>
