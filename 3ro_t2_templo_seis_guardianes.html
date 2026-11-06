@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>El Templo de los Seis Guardianes — Planeación Trimestral T2 · 3er grado</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@600;700;800&display=swap');
+:root{
+  --brand:#00B4D8; --brand-dark:#0086A8; --parchment:#FBF3E1; --parchment-dk:#F3E6C8;
+  --gold:#F4A100; --gold-dk:#C6830A; --leaf:#4E9A51; --leaf-dk:#357238;
+  --coral:#E8604C; --ink:#1A1A1A; --ink-soft:#5B5B5B;
+  --r16:16px; --r22:22px; --r28:28px;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{ margin:0; min-height:100vh; font-family:'Nunito',sans-serif; color:var(--ink);
+  background: radial-gradient(circle at 12% 8%, rgba(244,161,0,.14), transparent 40%),
+    radial-gradient(circle at 90% 85%, rgba(0,180,216,.14), transparent 45%), var(--parchment);
+  display:flex; justify-content:center; align-items:flex-start; }
+.app{ width:100%; max-width:900px; min-height:100vh; position:relative; padding-bottom:40px; }
+h1,h2,h3{ font-family:'Baloo 2',sans-serif; margin:0; }
+.screen{ display:none; flex-direction:column; animation:fade .25s ease; }
+.screen.on{ display:flex; }
+@keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+button{ font-family:'Baloo 2',sans-serif; cursor:pointer; border:none; }
+.brand-bar{ background:linear-gradient(160deg,var(--brand),var(--brand-dark)); padding:30px 36px 36px; border-radius:0 0 36px 36px; position:relative; overflow:hidden; }
+.brand-bar::after{ content:''; position:absolute; left:0; right:0; bottom:-2px; height:16px; background:repeating-linear-gradient(115deg,var(--gold) 0 20px, var(--gold-dk) 20px 40px); opacity:.5; }
+.brand-row{ display:flex; align-items:center; gap:16px; }
+#s-map .brand-row{ margin-top:46px; }
+.brand-logo{ width:64px; height:64px; border-radius:18px; background:rgba(255,255,255,.16); display:flex; align-items:center; justify-content:center; font-size:34px; border:1px solid rgba(255,255,255,.3); flex-shrink:0; }
+.brand-name{ color:#fff; font-weight:800; font-size:28px; letter-spacing:-.2px; }
+#s-map .brand-name{ font-size:24px; line-height:1.15; }
+.brand-tag{ color:#D9F2FA; font-size:16px; font-weight:700; margin-top:2px; }
+.back-btn{ width:48px; height:48px; border-radius:14px; background:var(--parchment-dk); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; position:absolute; top:28px; left:28px; }
+.acc-btn{ position:absolute; top:28px; right:28px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); border-radius:50%; width:50px; height:50px; font-size:22px; color:#fff; }
+.acc-overlay{ position:fixed; inset:0; background:rgba(26,26,26,.55); display:flex; align-items:flex-end; justify-content:center; z-index:500; }
+.acc-overlay.hidden{ display:none; }
+.acc-panel{ width:100%; max-width:900px; background:var(--parchment); border-radius:30px 30px 0 0; padding:30px 36px 36px; max-height:86vh; overflow:auto; }
+.acc-panel h3{ font-size:24px; color:var(--brand-dark); margin-bottom:4px; }
+.acc-panel .acc-sub{ font-size:15px; color:var(--ink-soft); margin-bottom:20px; line-height:1.4; }
+.acc-row{ display:flex; align-items:center; justify-content:space-between; gap:16px; background:#fff; border-radius:18px; padding:18px 20px; margin-bottom:12px; }
+.acc-row-txt .acc-label{ font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; color:var(--ink); }
+.acc-row-txt .acc-desc{ font-size:14px; color:var(--ink-soft); margin-top:2px; }
+.acc-switch{ width:58px; height:34px; border-radius:999px; background:var(--parchment-dk); position:relative; flex-shrink:0; border:none; }
+.acc-switch::after{ content:''; position:absolute; top:3px; left:3px; width:28px; height:28px; border-radius:50%; background:#fff; transition:.15s; box-shadow:0 1px 3px rgba(0,0,0,.25); }
+.acc-switch.on{ background:var(--leaf); }
+.acc-switch.on::after{ left:27px; }
+.acc-close{ width:100%; margin-top:8px; padding:18px; background:var(--brand-dark); color:#fff; border-radius:999px; font-weight:800; font-size:18px; }
+.app.a11y-large .prompt{ font-size:28px; }
+.app.a11y-large .opt{ font-size:26px; padding:24px 10px; }
+.app.a11y-large .l-instruction{ font-size:19px; }
+.app.a11y-large .brand-name{ font-size:32px; }
+.app.a11y-contrast{ --parchment:#FFFFFF; --parchment-dk:#E4E4E4; --ink:#000000; --ink-soft:#222222; }
+.app.a11y-contrast .opt{ border-width:5px; }
+.app.a11y-contrast .card{ box-shadow:0 0 0 3px #000; }
+.app.a11y-contrast .opt.correct{ background:#CDEFCD; border-color:#0B6B0B; }
+.app.a11y-contrast .opt.wrong{ background:#FBD3CC; border-color:#B32D18; }
+.app.a11y-dyslexia, .app.a11y-dyslexia .prompt, .app.a11y-dyslexia .opt, .app.a11y-dyslexia .l-instruction{ letter-spacing:0.06em; word-spacing:0.18em; line-height:1.7; }
+.app.a11y-dyslexia .prompt{ font-family:'Comic Sans MS','Baloo 2',sans-serif; }
+.app.a11y-calm .zone-deco{ display:none; }
+.app.a11y-simple .node-label{ display:none; }
+.parent-btn{ position:absolute; top:28px; right:90px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); border-radius:50%; width:50px; height:50px; font-size:22px; color:#fff; }
+.sound-btn{ position:absolute; top:28px; right:152px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); border-radius:50%; width:50px; height:50px; font-size:22px; color:#fff; }
+#confettiCanvas{ position:fixed; inset:0; pointer-events:none; z-index:900; }
+.student-badge{ display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.3); border-radius:999px; padding:10px 18px; margin:18px 36px 0; color:#fff; font-weight:700; }
+.student-badge .sb-name{ flex:1; font-size:16px; }
+.student-badge button{ background:rgba(255,255,255,.22); color:#fff; border-radius:999px; padding:8px 14px; font-size:13px; font-weight:800; }
+.name-input{ border:3px solid var(--parchment-dk); border-radius:14px; padding:16px 18px; font-size:18px; font-family:'Nunito',sans-serif; width:100%; margin-bottom:16px; }
+.pin-input{ font-family:'Baloo 2',sans-serif; font-weight:800; font-size:34px; letter-spacing:16px; text-align:center; border:none; border-bottom:4px dotted var(--gold-dk); padding:10px 0; width:100%; margin:16px 0 22px; background:transparent; color:var(--ink); }
+.pin-input:focus{ outline:none; }
+.pin-error{ color:var(--coral); font-weight:800; font-size:14px; text-align:center; min-height:18px; margin-top:-12px; margin-bottom:8px; }
+.map-scroll{ padding:34px 36px 20px; display:flex; flex-direction:column; align-items:center; gap:0; position:relative; }
+.zone-deco{ position:absolute; font-size:50px; opacity:.14; z-index:0; pointer-events:none; }
+.vine{ width:6px; height:46px; background:repeating-linear-gradient(var(--leaf) 0 8px, transparent 8px 15px); border-radius:3px; position:relative; z-index:1; }
+.leaf-node{ width:120px; height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; z-index:1; cursor:pointer; border-radius:63% 37% 54% 46% / 55% 45% 42% 58%; border:4px solid transparent; transition:.15s; background:#fff; box-shadow:0 4px 14px rgba(0,134,168,.14); }
+.leaf-node:active{ transform:scale(.95); }
+.leaf-node .le{ font-size:40px; }
+.leaf-node .ln{ font-size:14px; font-weight:800; margin-top:3px; color:var(--ink); text-align:center; max-width:96px; line-height:1.15; }
+.leaf-node.gold{ background:var(--gold); border-color:var(--gold-dk); }
+.leaf-node{ position:relative; }
+.leaf-node .done-badge{ display:none; position:absolute; top:-6px; right:-6px; width:30px; height:30px; border-radius:50%; background:var(--leaf); color:#fff; font-size:16px; font-weight:800; align-items:center; justify-content:center; border:3px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,.2); }
+.leaf-node.done .done-badge{ display:flex; }
+.node-label{ font-size:15px; color:var(--ink-soft); text-align:center; max-width:220px; margin:6px 0 22px; line-height:1.3; font-weight:700; }
+.l-instruction{ margin:20px 36px 0; background:#fff; border:2px dashed var(--brand); border-radius:18px; padding:18px 22px; font-size:17px; color:var(--ink); line-height:1.5; display:flex; gap:12px; align-items:flex-start; }
+.l-instruction .ico{ font-size:24px; flex-shrink:0; }
+.card{ margin:24px 36px; background:#fff; border-radius:var(--r28); padding:30px; box-shadow:0 10px 26px rgba(0,0,0,.08); position:relative; }
+.card::before{ content:''; position:absolute; top:0; right:0; width:32px; height:32px; background:linear-gradient(135deg,transparent 50%,var(--parchment-dk) 50%); border-radius:0 var(--r28) 0 0; }
+.scene{ font-size:3rem; text-align:center; margin-bottom:10px; }
+.prompt{ font-size:22px; font-weight:800; color:var(--ink); text-align:center; margin-bottom:24px; }
+.opts{ display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+.opts.c1{ grid-template-columns:1fr; }
+.opts.c3{ grid-template-columns:repeat(3,1fr); }
+.opt{ border:4px solid var(--parchment-dk); border-radius:20px; padding:20px 10px; background:var(--parchment); text-align:center; font-weight:800; font-size:18px; transition:.12s; min-height:70px; display:flex; align-items:center; justify-content:center; }
+.opt:active{ transform:scale(.96); }
+.opt.correct{ background:#E1F3E5; border-color:var(--leaf); }
+.opt.wrong{ background:#FBE2DD; border-color:var(--coral); }
+.feedback{ text-align:center; font-weight:800; font-size:18px; margin-top:22px; min-height:28px; color:var(--brand-dark); }
+.next-btn{ display:block; margin:22px auto 0; background:var(--brand); color:#fff; border-radius:999px; padding:18px 42px; font-weight:800; font-size:19px; box-shadow:0 4px 0 var(--brand-dark); }
+.next-btn.gold{ background:var(--gold); color:#1A1A1A; box-shadow:0 4px 0 var(--gold-dk); }
+.hidden{ display:none !important; }
+table.rep-table{ width:100%; border-collapse:collapse; font-size:14px; margin-top:10px; }
+table.rep-table th,table.rep-table td{ border:1px solid var(--parchment-dk); padding:8px 6px; text-align:center; }
+table.rep-table th{ background:var(--brand-dark); color:#fff; font-family:'Baloo 2',sans-serif; }
+table.rep-table td.ok{ color:var(--leaf-dk); font-weight:800; }
+table.rep-table td.no{ color:var(--ink-soft); }
+.rep-bar-bg{ background:var(--parchment-dk); border-radius:999px; height:10px; overflow:hidden; }
+.rep-bar{ background:var(--leaf); height:100%; }
+.parent-item{ display:flex; gap:10px; align-items:flex-start; margin-bottom:10px; font-size:14px; }
+.pi-ico{ font-size:20px; }
+footer{ text-align:center; color:var(--ink-soft); font-size:13px; font-weight:700; margin-top:20px; }
+</style>
+</head>
+<body>
+<canvas id="confettiCanvas"></canvas>
+<div class="app" id="app">
+
+  <!-- MAPA -->
+  <div class="screen on" id="s-map">
+    <div class="brand-bar">
+      <button class="sound-btn" onclick="toggleMute()" id="soundBtn" aria-label="Sonido">🔊</button>
+      <button class="acc-btn" onclick="openAccPanel()" aria-label="Accesibilidad">♿</button>
+      <button class="parent-btn" onclick="openParentGate()" aria-label="Vista de maestro">👪</button>
+      <div class="brand-row">
+        <div class="brand-logo">🏛️</div>
+        <div>
+          <div class="brand-name">El Templo de los Seis Guardianes</div>
+          <div class="brand-tag">Planeación Trimestral T2 · 3er grado</div>
+        </div>
+      </div>
+      <div class="student-badge">
+        <span>🙋</span>
+        <div class="sb-name" id="sbName">Sin alumno seleccionado</div>
+        <button onclick="openStudentPrompt()">Cambiar</button>
+      </div>
+    </div>
+    <div class="map-scroll">
+      <span class="zone-deco" style="top:10px;left:20px">🌿</span>
+      <span class="zone-deco" style="top:160px;right:10px">⭐</span>
+      <div class="leaf-node gold" id="node-p1" onclick="go('p1')"><span class="done-badge">&check;</span><div class="le">🦜</div><div class="ln">1. Templo de la Voz</div></div>
+      <div class="node-label">Con Tucán, el Guardián de la Voz Antigua</div>
+      <div class="vine"></div>
+      <div class="leaf-node" id="node-p2" onclick="go('p2')"><span class="done-badge">&check;</span><div class="le">🐜</div><div class="ln">2. Templo del Hormiguero</div></div>
+      <div class="node-label">Con Yaxil, la Guardiana del Hormiguero Sagrado</div>
+      <div class="vine"></div>
+      <div class="leaf-node gold" id="node-p3" onclick="go('p3')"><span class="done-badge">&check;</span><div class="le">🐍</div><div class="ln">3. Templo del Agua</div></div>
+      <div class="node-label">Con Anaconda, la Guardiana del Agua que Disuelve</div>
+      <div class="vine"></div>
+      <div class="leaf-node" id="node-p4" onclick="go('p4')"><span class="done-badge">&check;</span><div class="le">🐆</div><div class="ln">4. Templo de las Sombras</div></div>
+      <div class="node-label">Con Ocelote, el Guardián de las Emociones Silenciosas</div>
+      <div class="vine"></div>
+      <div class="leaf-node gold" id="node-p5" onclick="go('p5')"><span class="done-badge">&check;</span><div class="le">🦩</div><div class="ln">5. Templo del Nido</div></div>
+      <div class="node-label">Con Quetzal, la Guardiana del Nido Sagrado</div>
+      <div class="vine"></div>
+      <div class="leaf-node" id="node-p6" onclick="go('p6')"><span class="done-badge">&check;</span><div class="le">🦗</div><div class="ln">6. Templo del Canto</div></div>
+      <div class="node-label">Con Cigarra, la Guardiana del Canto Eterno</div>
+    </div>
+    <footer>EnciendeIA · Planeaciones NEM · Prohibida su reventa</footer>
+  </div>
+
+  <div class="screen" id="p1">
+    <div class="brand-bar">
+      <button class="back-btn" onclick="go('s-map')">&larr;</button>
+      <button class="acc-btn" onclick="openAccPanel()" aria-label="Accesibilidad">&#9855;</button>
+      <div class="brand-row" style="margin-left:60px">
+        <div class="brand-logo">🦜</div>
+        <div><div class="brand-name">Seamos Periodistas por un Día</div><div class="brand-tag">Proyecto 1</div></div>
+      </div>
+    </div>
+    <div class="l-instruction"><span class="ico">📖</span><span>Tucán quiere saber si puedes distinguir un hecho de una opinión antes de compartir una noticia.</span></div>
+    <div class="card">
+      <div class="prompt" id="p1Prompt"></div>
+      <div class="scene" id="p1Scene"></div>
+      <div class="opts " id="p1Opts"></div>
+      <div class="feedback" id="p1Feedback"></div>
+    </div>
+    <button class="next-btn gold" onclick="newP1()">🔀 Nuevo reto</button>
+    <button class="next-btn" onclick="go('s-map')">Volver al mapa</button>
+  </div>
+
+  <div class="screen" id="p2">
+    <div class="brand-bar">
+      <button class="back-btn" onclick="go('s-map')">&larr;</button>
+      <button class="acc-btn" onclick="openAccPanel()" aria-label="Accesibilidad">&#9855;</button>
+      <div class="brand-row" style="margin-left:60px">
+        <div class="brand-logo">🐜</div>
+        <div><div class="brand-name">La Asamblea Escolar</div><div class="brand-tag">Proyecto 2</div></div>
+      </div>
+    </div>
+    <div class="l-instruction"><span class="ico">📖</span><span>Yaxil quiere ayudarte a organizar una asamblea donde todos colaboren, como un hormiguero.</span></div>
+    <div class="card">
+      <div class="prompt" id="p2Prompt"></div>
+      <div class="scene" id="p2Scene"></div>
+      <div class="opts " id="p2Opts"></div>
+      <div class="feedback" id="p2Feedback"></div>
+    </div>
+    <button class="next-btn gold" onclick="newP2()">🔀 Nuevo reto</button>
+    <button class="next-btn" onclick="go('s-map')">Volver al mapa</button>
+  </div>
+
+  <div class="screen" id="p3">
+    <div class="brand-bar">
+      <button class="back-btn" onclick="go('s-map')">&larr;</button>
+      <button class="acc-btn" onclick="openAccPanel()" aria-label="Accesibilidad">&#9855;</button>
+      <div class="brand-row" style="margin-left:60px">
+        <div class="brand-logo">🐍</div>
+        <div><div class="brand-name">¿Cómo Conservar Nuestros Alimentos?</div><div class="brand-tag">Proyecto 3</div></div>
+      </div>
+    </div>
+    <div class="l-instruction"><span class="ico">📖</span><span>Anaconda reta al grupo a descubrir qué materiales se disuelven en agua y cuáles no.</span></div>
+    <div class="card">
+      <div class="prompt" id="p3Prompt"></div>
+      <div class="scene" id="p3Scene"></div>
+      <div class="opts " id="p3Opts"></div>
+      <div class="feedback" id="p3Feedback"></div>
+    </div>
+    <button class="next-btn gold" onclick="newP3()">🔀 Nuevo reto</button>
+    <button class="next-btn" onclick="go('s-map')">Volver al mapa</button>
+  </div>
+
+  <div class="screen" id="p4">
+    <div class="brand-bar">
+      <button class="back-btn" onclick="go('s-map')">&larr;</button>
+      <button class="acc-btn" onclick="openAccPanel()" aria-label="Accesibilidad">&#9855;</button>
+      <div class="brand-row" style="margin-left:60px">
+        <div class="brand-logo">🐆</div>
+        <div><div class="brand-name">Siento, Pienso, Decido</div><div class="brand-tag">Proyecto 4</div></div>
+      </div>
+    </div>
+    <div class="l-instruction"><span class="ico">📖</span><span>Ocelote te enseña a hacer una pausa entre lo que sientes y lo que decides hacer.</span></div>
+    <div class="card">
+      <div class="prompt" id="p4Prompt"></div>
+      <div class="scene" id="p4Scene"></div>
+      <div class="opts " id="p4Opts"></div>
+      <div class="feedback" id="p4Feedback"></div>
+    </div>
+    <button class="next-btn gold" onclick="newP4()">🔀 Nuevo reto</button>
+    <button class="next-btn" onclick="go('s-map')">Volver al mapa</button>
+  </div>
+
+  <div class="screen" id="p5">
+    <div class="brand-bar">
+      <button class="back-btn" onclick="go('s-map')">&larr;</button>
+      <button class="acc-btn" onclick="openAccPanel()" aria-label="Accesibilidad">&#9855;</button>
+      <div class="brand-row" style="margin-left:60px">
+        <div class="brand-logo">🦩</div>
+        <div><div class="brand-name">¡Uno, Dos, Tres, por Mí y por Toda mi Familia!</div><div class="brand-tag">Proyecto 5</div></div>
+      </div>
+    </div>
+    <div class="l-instruction"><span class="ico">📖</span><span>Quetzal te muestra que, así como no hay dos nidos iguales en la selva, tampoco hay dos familias iguales.</span></div>
+    <div class="card">
+      <div class="prompt" id="p5Prompt"></div>
+      <div class="scene" id="p5Scene"></div>
+      <div class="opts " id="p5Opts"></div>
+      <div class="feedback" id="p5Feedback"></div>
+    </div>
+    <button class="next-btn gold" onclick="newP5()">🔀 Nuevo reto</button>
+    <button class="next-btn" onclick="go('s-map')">Volver al mapa</button>
+  </div>
+
+  <div class="screen" id="p6">
+    <div class="brand-bar">
+      <button class="back-btn" onclick="go('s-map')">&larr;</button>
+      <button class="acc-btn" onclick="openAccPanel()" aria-label="Accesibilidad">&#9855;</button>
+      <div class="brand-row" style="margin-left:60px">
+        <div class="brand-logo">🦗</div>
+        <div><div class="brand-name">Las Rimas, Como el Pan, con Todo Van</div><div class="brand-tag">Proyecto 6</div></div>
+      </div>
+    </div>
+    <div class="l-instruction"><span class="ico">📖</span><span>Cigarra te invita a jugar con el ritmo y la rima para crear algo que se quede en la memoria.</span></div>
+    <div class="card">
+      <div class="prompt" id="p6Prompt"></div>
+      <div class="scene" id="p6Scene"></div>
+      <div class="opts " id="p6Opts"></div>
+      <div class="feedback" id="p6Feedback"></div>
+    </div>
+    <button class="next-btn gold" onclick="newP6()">🔀 Nuevo reto</button>
+    <button class="next-btn" onclick="go('s-map')">Volver al mapa</button>
+  </div>
+
+
+</div>
+
+<!-- PANEL DE ACCESIBILIDAD -->
+<div class="acc-overlay hidden" id="accOverlay">
+  <div class="acc-panel">
+    <h3>Accesibilidad</h3>
+    <div class="acc-sub">Ajustes que se guardan en este dispositivo.</div>
+    <div class="acc-row"><div class="acc-row-txt"><div class="acc-label">Texto grande</div><div class="acc-desc">Aumenta el tamaño de letras y botones.</div></div><button class="acc-switch" id="swLarge" onclick="toggleA11y('large')"></button></div>
+    <div class="acc-row"><div class="acc-row-txt"><div class="acc-label">Alto contraste</div><div class="acc-desc">Colores más marcados para mejor visibilidad.</div></div><button class="acc-switch" id="swContrast" onclick="toggleA11y('contrast')"></button></div>
+    <div class="acc-row"><div class="acc-row-txt"><div class="acc-label">Modo de baja estimulación</div><div class="acc-desc">Quita decoraciones — pensado para sensibilidad sensorial.</div></div><button class="acc-switch" id="swCalm" onclick="toggleA11y('calm')"></button></div>
+    <div class="acc-row"><div class="acc-row-txt"><div class="acc-label">Espaciado para dislexia</div><div class="acc-desc">Más espacio entre letras y una fuente distinta.</div></div><button class="acc-switch" id="swDyslexia" onclick="toggleA11y('dyslexia')"></button></div>
+    <div class="acc-row"><div class="acc-row-txt"><div class="acc-label">Modo simplificado</div><div class="acc-desc">Menos texto por pantalla.</div></div><button class="acc-switch" id="swSimple" onclick="toggleA11y('simple')"></button></div>
+    <button class="acc-close" onclick="closeAccPanel()">Cerrar</button>
+  </div>
+</div>
+
+<!-- SELECCIONAR ALUMNO -->
+<div class="acc-overlay hidden" id="studentOverlay">
+  <div class="acc-panel">
+    <h3>¿Quién va a jugar?</h3>
+    <div class="acc-sub">Escribe tu nombre para que tu maestro(a) pueda ver tu avance.</div>
+    <input id="studentNameInput" type="text" class="name-input" placeholder="Nombre del alumno" onkeydown="if(event.key==='Enter')submitStudentName()">
+    <button class="acc-close" onclick="submitStudentName()">Empezar a jugar</button>
+  </div>
+</div>
+
+<!-- VISTA DE MAESTRO (PIN) -->
+<div class="acc-overlay hidden" id="parentGateOverlay">
+  <div class="acc-panel">
+    <h3>Vista de maestro/a</h3>
+    <div class="acc-sub">Ingresa el PIN para ver el avance de cada alumno.</div>
+    <input id="parentPinInput" type="tel" inputmode="numeric" maxlength="4" placeholder="••••" class="pin-input" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)">
+    <div class="pin-error" id="pinError"></div>
+    <button class="acc-close" onclick="submitParentPin()">Entrar</button>
+    <button class="acc-close" style="background:var(--parchment-dk);color:var(--ink);margin-top:10px" onclick="closeParentGate()">Cancelar</button>
+  </div>
+</div>
+
+<!-- PANEL DE MAESTRO -->
+<div class="acc-overlay hidden" id="parentPanelOverlay">
+  <div class="acc-panel">
+    <h3>Panel de maestro/a</h3>
+    <div class="acc-sub">Avance real de cada alumno que ha jugado en este dispositivo.</div>
+    <div id="teacherTableWrap"></div>
+    <button class="acc-close" style="background:var(--gold);color:#1A1A1A;margin-top:14px" onclick="exportStudentsCSV()">⬇️ Exportar avance (Excel / CSV)</button>
+    <h3 style="margin-top:24px;font-size:19px">Respuestas clave</h3>
+    <div class="parent-item"><div class="pi-ico">🦜</div><div>Una nota informativa cuenta hechos reales (qué, quién, cómo, cuándo, dónde y por qué); una opinión es lo que alguien piensa sobre esos hechos. Antes de compartir información hay que verificarla.</div></div>
+    <div class="parent-item"><div class="pi-ico">🐜</div><div>Una asamblea organiza la colaboración de todos: se escuchan propuestas, se vota con respeto y se registra lo acordado en un acta.</div></div>
+    <div class="parent-item"><div class="pi-ico">🐍</div><div>El azúcar y la sal se disuelven en agua (son solubles); el aceite, el talco y la arena no se disuelven (son insolubles). Entender esto ayuda a conservar mejor los alimentos.</div></div>
+    <div class="parent-item"><div class="pi-ico">🐆</div><div>Entre sentir una emoción y actuar hay un momento para pensar; usar esa pausa (siento → pienso → decido) ayuda a responder de forma asertiva, sin impulsividad.</div></div>
+    <div class="parent-item"><div class="pi-ico">🦩</div><div>Cada familia tiene su propia forma de convivir y sus propios valores; todas las familias merecen el mismo respeto, aunque sean distintas a la mía.</div></div>
+    <div class="parent-item"><div class="pi-ico">🦗</div><div>Dos palabras riman cuando terminan con un sonido parecido; la rima y el ritmo hacen que un poema, canción o juego de palabras se quede en la memoria.</div></div>
+    <div class="parent-item"><div class="pi-ico">📶</div><div>Este juego funciona sin internet una vez cargado — ábrelo con wifi antes de ir a la escuela.</div></div>
+    <button class="acc-close" style="margin-top:10px" onclick="closeParentPanel()">Cerrar</button>
+  </div>
+</div>
+
+<script>
+const PARENT_PIN = '2026';
+const LS_PREFIX = 'casa6g3t2';
+
+let muted = (localStorage.getItem(LS_PREFIX+'_muted') === '1');
+let audioCtx = null;
+function ensureAudio(){ if(!audioCtx){ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); } return audioCtx; }
+function beep(freq, dur, type, vol, delay){
+  if(muted) return;
+  try{
+    const ctx = ensureAudio();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type || 'sine'; o.frequency.value = freq;
+    o.connect(g); g.connect(ctx.destination);
+    const t = ctx.currentTime + (delay||0);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol||0.25, t+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t+(dur||0.15));
+    o.start(t); o.stop(t+(dur||0.15)+0.03);
+  }catch(e){}
+}
+function soundCorrect(){ beep(523.25,0.12,'triangle',0.28,0); beep(659.25,0.12,'triangle',0.28,0.1); beep(784,0.2,'triangle',0.28,0.2); confettiBurst(); }
+function soundWrong(){ beep(200,0.2,'sawtooth',0.18,0); }
+function soundClick(){ beep(700,0.05,'sine',0.12,0); }
+function toggleMute(){
+  muted = !muted;
+  localStorage.setItem(LS_PREFIX+'_muted', muted ? '1':'0');
+  document.getElementById('soundBtn').textContent = muted ? '🔇' : '🔊';
+  if(!muted) beep(700,0.08,'sine',0.15,0);
+}
+(function(){ const b = document.getElementById('soundBtn'); if(b) b.textContent = muted ? '🔇' : '🔊'; })();
+
+const confettiCanvas = document.getElementById('confettiCanvas');
+const cctx = confettiCanvas.getContext('2d');
+let confettiParticles = [];
+let confettiRunning = false;
+function resizeConfetti(){ confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight; }
+window.addEventListener('resize', resizeConfetti);
+resizeConfetti();
+const CONFETTI_COLORS = ['#00B4D8','#F4A100','#4E9A51','#E8604C','#0086A8'];
+function confettiBurst(){
+  const cx = window.innerWidth/2, cy = window.innerHeight*0.3;
+  for(let i=0;i<70;i++){
+    confettiParticles.push({ x: cx, y: cy, vx:(Math.random()-0.5)*14, vy:Math.random()*-10-4, size:Math.random()*8+5,
+      color: CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)], rot:Math.random()*360, vr:(Math.random()-0.5)*18, life:0 });
+  }
+  if(!confettiRunning){ confettiRunning = true; requestAnimationFrame(confettiStep); }
+}
+function confettiStep(){
+  cctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+  confettiParticles.forEach(p=>{
+    p.vy += 0.4; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life++;
+    cctx.save(); cctx.translate(p.x,p.y); cctx.rotate(p.rot*Math.PI/180);
+    cctx.fillStyle = p.color; cctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.6);
+    cctx.restore();
+  });
+  confettiParticles = confettiParticles.filter(p=>p.life < 140 && p.y < confettiCanvas.height+40);
+  if(confettiParticles.length){ requestAnimationFrame(confettiStep); }
+  else { confettiRunning = false; cctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height); }
+}
+
+function openAccPanel(){ document.getElementById('accOverlay').classList.remove('hidden'); }
+function closeAccPanel(){ document.getElementById('accOverlay').classList.add('hidden'); }
+function toggleA11y(key){
+  const app = document.getElementById('app');
+  const cls = 'a11y-'+key;
+  const sw = document.getElementById('sw'+key.charAt(0).toUpperCase()+key.slice(1));
+  const isOn = app.classList.toggle(cls);
+  sw.classList.toggle('on', isOn);
+  localStorage.setItem(LS_PREFIX+'_a11y_'+key, isOn ? '1':'0');
+}
+(function(){
+  ['large','contrast','calm','dyslexia','simple'].forEach(key=>{
+    if(localStorage.getItem(LS_PREFIX+'_a11y_'+key) === '1'){
+      document.getElementById('app').classList.add('a11y-'+key);
+      const sw = document.getElementById('sw'+key.charAt(0).toUpperCase()+key.slice(1));
+      if(sw) sw.classList.add('on');
+    }
+  });
+})();
+
+let students = JSON.parse(localStorage.getItem(LS_PREFIX+'_students') || '{}');
+let currentStudent = localStorage.getItem(LS_PREFIX+'_current') || '';
+const ACT_IDS = ["p1", "p2", "p3", "p4", "p5", "p6"];
+const ACT_NAMES = {"p1": "Templo de la Voz", "p2": "Templo del Hormiguero", "p3": "Templo del Agua", "p4": "Templo de las Sombras", "p5": "Templo del Nido", "p6": "Templo del Canto"};
+
+function saveStudents(){ localStorage.setItem(LS_PREFIX+'_students', JSON.stringify(students)); }
+function ensureStudentRecord(name){
+  if(!students[name]) students[name] = {};
+  ACT_IDS.forEach(id=>{ if(!students[name][id]) students[name][id] = {attempts:0, correct:0, done:false}; });
+}
+function renderStudentBadge(){
+  document.getElementById('sbName').textContent = currentStudent ? currentStudent : 'Sin alumno seleccionado — toca "Cambiar"';
+}
+function openStudentPrompt(){
+  document.getElementById('studentNameInput').value = currentStudent || '';
+  document.getElementById('studentOverlay').classList.remove('hidden');
+}
+function submitStudentName(){
+  const name = document.getElementById('studentNameInput').value.trim();
+  if(!name){ return; }
+  currentStudent = name;
+  localStorage.setItem(LS_PREFIX+'_current', name);
+  ensureStudentRecord(name);
+  saveStudents();
+  document.getElementById('studentOverlay').classList.add('hidden');
+  renderStudentBadge();
+  refreshDoneBadges();
+  soundClick();
+}
+if(currentStudent){ ensureStudentRecord(currentStudent); }
+renderStudentBadge();
+
+function recordAnswer(actId, isCorrect){
+  if(!currentStudent){ openStudentPrompt(); return; }
+  ensureStudentRecord(currentStudent);
+  const rec = students[currentStudent][actId];
+  rec.attempts++;
+  if(isCorrect){ rec.correct++; rec.done = true; }
+  students[currentStudent].lastActive = new Date().toLocaleDateString('es-MX');
+  saveStudents();
+  refreshDoneBadges();
+}
+function refreshDoneBadges(){
+  ACT_IDS.forEach(id=>{
+    const node = document.getElementById('node-'+id);
+    if(!node) return;
+    const done = currentStudent && students[currentStudent] && students[currentStudent][id] && students[currentStudent][id].done;
+    node.classList.toggle('done', !!done);
+  });
+}
+refreshDoneBadges();
+
+function go(id){
+  if(id !== 's-map' && !currentStudent){ openStudentPrompt(); return; }
+  document.querySelectorAll('.screen.on').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0,0);
+  if(id==='s-map') refreshDoneBadges();
+}
+
+function openParentGate(){
+  document.getElementById('parentPinInput').value = '';
+  document.getElementById('pinError').textContent = '';
+  document.getElementById('parentGateOverlay').classList.remove('hidden');
+}
+function closeParentGate(){ document.getElementById('parentGateOverlay').classList.add('hidden'); }
+function submitParentPin(){
+  const val = document.getElementById('parentPinInput').value;
+  if(val === PARENT_PIN){
+    closeParentGate();
+    renderTeacherTable();
+    document.getElementById('parentPanelOverlay').classList.remove('hidden');
+  } else {
+    document.getElementById('pinError').textContent = 'PIN incorrecto.';
+  }
+}
+function closeParentPanel(){ document.getElementById('parentPanelOverlay').classList.add('hidden'); }
+function renderTeacherTable(){
+  const names = Object.keys(students);
+  const wrap = document.getElementById('teacherTableWrap');
+  if(!names.length){ wrap.innerHTML = '<div class="feedback">Todavía ningún alumno ha jugado en este dispositivo.</div>'; return; }
+  let html = '<table class="rep-table"><tr><th>Alumno</th>' + ACT_IDS.map(id=>`<th>${ACT_NAMES[id]}</th>`).join('') + '<th>Avance</th></tr>';
+  names.forEach(name=>{
+    const rec = students[name];
+    let doneCount = 0;
+    let row = `<tr><td style="text-align:left;font-weight:800">${name}</td>`;
+    ACT_IDS.forEach(id=>{
+      const d = rec[id] && rec[id].done;
+      if(d) doneCount++;
+      row += `<td class="${d?'ok':'no'}">${d?'✓':'—'}</td>`;
+    });
+    const pct = Math.round((doneCount/ACT_IDS.length)*100);
+    row += `<td><div class="rep-bar-bg"><div class="rep-bar" style="width:${pct}%"></div></div>${pct}%</td></tr>`;
+    html += row;
+  });
+  html += '</table>';
+  wrap.innerHTML = html;
+}
+function exportStudentsCSV(){
+  const names = Object.keys(students);
+  if(!names.length){ alert('Todavía no hay alumnos registrados en este dispositivo.'); return; }
+  let csv = 'Alumno,' + ACT_IDS.map(id=>ACT_NAMES[id]).join(',') + ',Avance (%),Intentos totales,Aciertos totales,Última vez\n';
+  names.forEach(name=>{
+    const rec = students[name];
+    let doneCount = 0, attempts = 0, correct = 0;
+    const cols = ACT_IDS.map(id=>{
+      const r = rec[id] || {done:false,attempts:0,correct:0};
+      if(r.done) doneCount++;
+      attempts += r.attempts; correct += r.correct;
+      return r.done ? 'Sí' : 'No';
+    });
+    const pct = Math.round((doneCount/ACT_IDS.length)*100);
+    csv += `"${name.replace(/"/g,'""')}",${cols.join(',')},${pct},${attempts},${correct},"${rec.lastActive||''}"\n`;
+  });
+  const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const fecha = new Date().toLocaleDateString('es-MX').replace(/\//g,'-');
+  a.href = url; a.download = 'Avance_casa6g3t2_'+fecha+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+
+const p1Bank = [{"prompt": "¿Cuál de estas frases es un HECHO, no una opinión?", "scene": "📰", "ok": "Hoy no hubo clases por la lluvia", "wrong": ["La lluvia es aburrida", "El recreo debería ser más largo"]}, {"prompt": "¿Qué preguntas debe responder una nota informativa?", "scene": "🔍", "ok": "Qué, quién, cómo, cuándo, dónde y por qué", "wrong": ["Solo qué tan divertido fue", "Solo quién lo cuenta"]}, {"prompt": "Antes de compartir una noticia con tu comunidad, ¿qué debes hacer?", "scene": "✅", "ok": "Verificar que sea cierta", "wrong": ["Compartirla de inmediato sin revisar", "Inventarle detalles para que sea más interesante"]}];
+let p1Idx = 0;
+function renderP1(){
+  const s = p1Bank[p1Idx];
+  document.getElementById('p1Prompt').textContent = s.prompt || '';
+  document.getElementById('p1Scene').textContent = s.scene || '';
+  const opts = [s.ok, ...s.wrong].sort(()=>Math.random()-0.5);
+  const el = document.getElementById('p1Opts'); el.innerHTML = '';
+  opts.forEach(o=>{
+    const d = document.createElement('div'); d.className='opt'; d.textContent=o;
+    d.onclick = () => {
+      document.querySelectorAll('#p1Opts .opt').forEach(x=>x.classList.remove('correct','wrong'));
+      const ok = o===s.ok; d.classList.add(ok?'correct':'wrong');
+      document.getElementById('p1Feedback').textContent = ok ? '¡Correcto!' : (s.hint || 'Piénsalo de nuevo.');
+      recordAnswer('p1', ok); if(ok) soundCorrect(); else soundWrong();
+    };
+    el.appendChild(d);
+  });
+  document.getElementById('p1Feedback').textContent = '';
+}
+function newP1(){ soundClick(); p1Idx=(p1Idx+1)%p1Bank.length; renderP1(); }
+renderP1();
+
+
+const p2Bank = [{"prompt": "¿Qué es una asamblea escolar?", "scene": "🏫", "ok": "Una reunión donde el grupo decide algo junto", "wrong": ["Una decisión que toma solo el maestro", "Un recreo más largo"]}, {"prompt": "En la asamblea cada equipo presenta su propuesta. ¿Cómo decide el grupo cuál seguir?", "scene": "🗳️", "ok": "Votando con respeto, como se acordó", "wrong": ["El más fuerte decide por todos", "Gritando más fuerte"]}, {"prompt": "¿Para qué sirve escribir un acta de acuerdos al final de la asamblea?", "scene": "📋", "ok": "Para recordar lo que se decidió en colectivo", "wrong": ["Para que nadie cumpla lo acordado", "No sirve para nada"]}];
+let p2Idx = 0;
+function renderP2(){
+  const s = p2Bank[p2Idx];
+  document.getElementById('p2Prompt').textContent = s.prompt || '';
+  document.getElementById('p2Scene').textContent = s.scene || '';
+  const opts = [s.ok, ...s.wrong].sort(()=>Math.random()-0.5);
+  const el = document.getElementById('p2Opts'); el.innerHTML = '';
+  opts.forEach(o=>{
+    const d = document.createElement('div'); d.className='opt'; d.textContent=o;
+    d.onclick = () => {
+      document.querySelectorAll('#p2Opts .opt').forEach(x=>x.classList.remove('correct','wrong'));
+      const ok = o===s.ok; d.classList.add(ok?'correct':'wrong');
+      document.getElementById('p2Feedback').textContent = ok ? '¡Correcto!' : (s.hint || 'Piénsalo de nuevo.');
+      recordAnswer('p2', ok); if(ok) soundCorrect(); else soundWrong();
+    };
+    el.appendChild(d);
+  });
+  document.getElementById('p2Feedback').textContent = '';
+}
+function newP2(){ soundClick(); p2Idx=(p2Idx+1)%p2Bank.length; renderP2(); }
+renderP2();
+
+
+const p3Bank = [{"prompt": "¿Cuál de estos materiales SÍ se disuelve en agua?", "scene": "🧂", "ok": "La sal", "wrong": ["El aceite", "La arena"]}, {"prompt": "¿Cuál de estos materiales NO se disuelve en agua?", "scene": "🫙", "ok": "El aceite", "wrong": ["El azúcar", "La sal"]}, {"prompt": "¿Para qué sirvió experimentar con estos materiales en el proyecto?", "scene": "🧊", "ok": "Para diseñar un refrigerador casero sin electricidad", "wrong": ["Para pintar un cuadro", "Para aprender a cocinar pasteles"]}];
+let p3Idx = 0;
+function renderP3(){
+  const s = p3Bank[p3Idx];
+  document.getElementById('p3Prompt').textContent = s.prompt || '';
+  document.getElementById('p3Scene').textContent = s.scene || '';
+  const opts = [s.ok, ...s.wrong].sort(()=>Math.random()-0.5);
+  const el = document.getElementById('p3Opts'); el.innerHTML = '';
+  opts.forEach(o=>{
+    const d = document.createElement('div'); d.className='opt'; d.textContent=o;
+    d.onclick = () => {
+      document.querySelectorAll('#p3Opts .opt').forEach(x=>x.classList.remove('correct','wrong'));
+      const ok = o===s.ok; d.classList.add(ok?'correct':'wrong');
+      document.getElementById('p3Feedback').textContent = ok ? '¡Correcto!' : (s.hint || 'Piénsalo de nuevo.');
+      recordAnswer('p3', ok); if(ok) soundCorrect(); else soundWrong();
+    };
+    el.appendChild(d);
+  });
+  document.getElementById('p3Feedback').textContent = '';
+}
+function newP3(){ soundClick(); p3Idx=(p3Idx+1)%p3Bank.length; renderP3(); }
+renderP3();
+
+
+const p4Bank = [{"prompt": "¿Cuál es el orden correcto de la secuencia que enseña Ocelote?", "scene": "🐆", "ok": "Siento, pienso y después decido", "wrong": ["Decido, siento y después pienso", "Actúo sin pensar"]}, {"prompt": "Un compañero te quita tu lugar en la fila. ¿Cuál es una frase asertiva para poner un límite?", "scene": "🙅", "ok": "\"No me gusta que hagas eso, por favor respeta mi lugar\"", "wrong": ["Empujarlo sin decir nada", "Quedarme callado y guardar el enojo"]}, {"prompt": "¿Para qué sirve reconocer lo que sientes antes de actuar?", "scene": "💭", "ok": "Para decidir cómo actuar a favor de mi bienestar", "wrong": ["Para actuar siempre por impulso", "No sirve para nada"]}];
+let p4Idx = 0;
+function renderP4(){
+  const s = p4Bank[p4Idx];
+  document.getElementById('p4Prompt').textContent = s.prompt || '';
+  document.getElementById('p4Scene').textContent = s.scene || '';
+  const opts = [s.ok, ...s.wrong].sort(()=>Math.random()-0.5);
+  const el = document.getElementById('p4Opts'); el.innerHTML = '';
+  opts.forEach(o=>{
+    const d = document.createElement('div'); d.className='opt'; d.textContent=o;
+    d.onclick = () => {
+      document.querySelectorAll('#p4Opts .opt').forEach(x=>x.classList.remove('correct','wrong'));
+      const ok = o===s.ok; d.classList.add(ok?'correct':'wrong');
+      document.getElementById('p4Feedback').textContent = ok ? '¡Correcto!' : (s.hint || 'Piénsalo de nuevo.');
+      recordAnswer('p4', ok); if(ok) soundCorrect(); else soundWrong();
+    };
+    el.appendChild(d);
+  });
+  document.getElementById('p4Feedback').textContent = '';
+}
+function newP4(){ soundClick(); p4Idx=(p4Idx+1)%p4Bank.length; renderP4(); }
+renderP4();
+
+
+const p5Bank = [{"prompt": "¿Qué nos enseña Quetzal sobre las familias?", "scene": "🦩", "ok": "Que todas las familias son distintas y merecen el mismo respeto", "wrong": ["Que todas las familias deben ser iguales", "Que unas familias son mejores que otras"]}, {"prompt": "Si la familia de tu compañero es distinta a la tuya, ¿qué debes hacer?", "scene": "🤝", "ok": "Respetarla igual que a la mía", "wrong": ["Burlarme de ella", "Decir que la mía es mejor"]}, {"prompt": "¿Qué representa el Tendedero familiar que hace el grupo al final del proyecto?", "scene": "🧺", "ok": "Algo de valor o tradición de cada familia", "wrong": ["La ropa que más les gusta", "Nada importante"]}];
+let p5Idx = 0;
+function renderP5(){
+  const s = p5Bank[p5Idx];
+  document.getElementById('p5Prompt').textContent = s.prompt || '';
+  document.getElementById('p5Scene').textContent = s.scene || '';
+  const opts = [s.ok, ...s.wrong].sort(()=>Math.random()-0.5);
+  const el = document.getElementById('p5Opts'); el.innerHTML = '';
+  opts.forEach(o=>{
+    const d = document.createElement('div'); d.className='opt'; d.textContent=o;
+    d.onclick = () => {
+      document.querySelectorAll('#p5Opts .opt').forEach(x=>x.classList.remove('correct','wrong'));
+      const ok = o===s.ok; d.classList.add(ok?'correct':'wrong');
+      document.getElementById('p5Feedback').textContent = ok ? '¡Correcto!' : (s.hint || 'Piénsalo de nuevo.');
+      recordAnswer('p5', ok); if(ok) soundCorrect(); else soundWrong();
+    };
+    el.appendChild(d);
+  });
+  document.getElementById('p5Feedback').textContent = '';
+}
+function newP5(){ soundClick(); p5Idx=(p5Idx+1)%p5Bank.length; renderP5(); }
+renderP5();
+
+
+const p6Bank = [{"prompt": "¿Qué significa que dos palabras 'rimen'?", "scene": "🎵", "ok": "Que terminan con un sonido parecido", "wrong": ["Que empiezan con la misma letra siempre", "Que tienen el mismo número de letras"]}, {"prompt": "¿Cuál de estas palabras rima con 'canción'?", "scene": "🎶", "ok": "Corazón", "wrong": ["Ventana", "Zapato"]}, {"prompt": "Al final del proyecto, ¿qué crea el grupo con Cigarra para compartir con la comunidad escolar?", "scene": "🦗", "ok": "Una canción o poema propio", "wrong": ["Un examen de matemáticas", "Un mapa de la selva"]}];
+let p6Idx = 0;
+function renderP6(){
+  const s = p6Bank[p6Idx];
+  document.getElementById('p6Prompt').textContent = s.prompt || '';
+  document.getElementById('p6Scene').textContent = s.scene || '';
+  const opts = [s.ok, ...s.wrong].sort(()=>Math.random()-0.5);
+  const el = document.getElementById('p6Opts'); el.innerHTML = '';
+  opts.forEach(o=>{
+    const d = document.createElement('div'); d.className='opt'; d.textContent=o;
+    d.onclick = () => {
+      document.querySelectorAll('#p6Opts .opt').forEach(x=>x.classList.remove('correct','wrong'));
+      const ok = o===s.ok; d.classList.add(ok?'correct':'wrong');
+      document.getElementById('p6Feedback').textContent = ok ? '¡Correcto!' : (s.hint || 'Piénsalo de nuevo.');
+      recordAnswer('p6', ok); if(ok) soundCorrect(); else soundWrong();
+    };
+    el.appendChild(d);
+  });
+  document.getElementById('p6Feedback').textContent = '';
+}
+function newP6(){ soundClick(); p6Idx=(p6Idx+1)%p6Bank.length; renderP6(); }
+renderP6();
+
+</script>
+</body>
+</html>
